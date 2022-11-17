@@ -13,7 +13,7 @@ website:
           # - 03a_utils.colormap.ipynb
           # - 03b_utils.pad.ipynb
           # - 03c_utils.tile2d.ipynb
-      # - section: ✨ Misc
-        # contents:
-          # - 10_patch.ipynb
+      - section: ✨ Misc
+        contents:
+          - 10_patch.ipynb
           # - history.ipynb
