@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "lovely-numpy"
+  site-url: "https://xl0.github.io/lovely-numpy"
+  description: "Lovely Numpy"
+  repo-branch: master
+  repo-url: "https://github.com/xl0/lovely-numpy"
