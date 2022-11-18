@@ -53,7 +53,7 @@ Are any of the values `nan` or `inf`?
 Is it an image of a man holding a tench?
 
 ``` python
-from lovely_numpy import lovely
+from lovely_numpy import lovely, rgb
 ```
 
 ## `lovely()`
@@ -132,3 +132,27 @@ lovely(numbers[:,:3,:5], depth=2)
         ndarray[5] f32 x∈[-0.985, -0.672] μ=-0.846 σ=0.110 [-0.672, -0.985, -0.881, -0.776, -0.916]
         ndarray[5] f32 x∈[-1.212, -0.724] μ=-0.989 σ=0.160 [-0.724, -1.072, -0.968, -0.968, -1.212]
         ndarray[5] f32 x∈[-1.316, -0.828] μ=-1.058 σ=0.160 [-0.828, -1.125, -1.020, -1.003, -1.316]
+
+## Now in `.rgb` color
+
+The important queston - is it our man?
+
+``` python
+rgb(numbers, cl=0)
+```
+
+![](index_files/figure-gfm/cell-11-output-1.png)
+
+*Maaaaybe?* Looks like someone normalized him.
+
+``` python
+in_stats = ( (0.485, 0.456, 0.406),     # mean 
+             (0.229, 0.224, 0.225) )    # std
+
+# numbers.rgb(in_stats, cl=True) # For channel-last input format
+rgb(numbers, denorm=in_stats, cl=0)
+```
+
+![](index_files/figure-gfm/cell-12-output-1.png)
+
+It’s indeed our hero, the Tenchman!
