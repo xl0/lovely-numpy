@@ -6,8 +6,6 @@ __all__ = ['pad_frame', 'pad_frame_gutters']
 # %% ../../nbs/03b_utils.pad.ipynb 4
 from math import ceil
 import numpy as np
-# import torch
-from torch.nn.functional import pad
 
 # %% ../../nbs/03b_utils.pad.ipynb 6
 def pad_frame(t: np.ndarray, # torch.Tensor,  # 3D+ image tensor, [...,H,W,C]
