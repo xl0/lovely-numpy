@@ -7,10 +7,10 @@ website:
           - 00_repr_str.ipynb
           - 01_repr_rgb.ipynb
           # - 02_repr_plt.ipynb
-          # - 05_repr_chans.ipynb
+          - 05_repr_chans.ipynb
       - section: 🖼️ Image utils
         contents:
-          # - 03a_utils.colormap.ipynb
+          - 03a_utils.colormap.ipynb
           - 03b_utils.pad.ipynb
           - 03c_utils.tile2d.ipynb
       - section: ✨ Misc
