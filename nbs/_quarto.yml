@@ -5,21 +5,24 @@ format:
   html:
     theme: cosmo
     css: styles.css
-    # toc: true
+    toc: true
+    toc-location: left
     page-layout: full
 
 website:
   twitter-card: true
   open-graph: true
-  repo-actions: [issue]
+  # repo-actions: [issue]
   navbar:
     background: primary
     search: true
     right:
       - icon: github
-        href: "http://github.com/xl0/lovely-tensors/"
+        href: "http://github.com/xl0/lovely-numpy/"
       - icon: twitter
         href: "https://twitter.com/xl0xl0xl0"
+      - icon: mastodon
+        href: "https://sigmoid.social/@xl0"
   sidebar:
     style: floating
 
