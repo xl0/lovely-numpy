@@ -16,11 +16,16 @@ def rgb(t: np.ndarray,             # Array to display. [[...], C,H,W] or [[...],
         cl: Union[int, bool]=True, # Channel-last
         gutter_px = 3,             # If more than one tensor -> tile with this gutter width
         frame_px=1,                # If more than one tensor -> tile with this frame width
+        scale=1,                   # Stretch the image. Only itegers please.
         view_width=966):           # target width of the image
-
+    
+    assert t.ndim >= 3, f"Expecting 3 or more dimension input, got shape=({t.shape})"
     # swap channels if it's not channe-last already
     if not cl:
         t = np.swapaxes(np.swapaxes(t, -3, -1), -3, -2)
+
+    scale = int(scale)
+    t = t.repeat(scale, axis=-2).repeat(scale, axis=-3)
 
     n_ch = t.shape[-1]
     assert n_ch in (3, 4), f"Expecting 3 (RGB) or 4 (RGBA) color channels, got {n_ch}, shape=({t.shape})"
