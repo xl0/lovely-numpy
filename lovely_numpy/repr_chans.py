@@ -3,23 +3,22 @@
 # %% auto 0
 __all__ = ['chans']
 
-# %% ../nbs/05_repr_chans.ipynb 4
+# %% ../nbs/05_repr_chans.ipynb 3
 import numpy as np
-from matplotlib.cm import get_cmap
-# import torch
 from . import lovely
-from .repr_rgb import RGBProxy, rgb
-from .utils.colormap import InfCmap
 
-# %% ../nbs/05_repr_chans.ipynb 5
-def _chans(t: np.ndarray,         # Input tensor 
-                 cmap = "coolwarm", # Use matplotlib colormap by this name
-                 cm_below="blue", cm_above="red",
-                 cm_ninf="cyan", cm_pinf="fuchsia",
-                 cm_nan="yellow",
-                 gutter_px=3,   # Draw write gutters when tiling the images
-                 frame_px=1,    # Draw black frame around each image
-                 view_width=966):    
+from .repr_rgb import rgb
+from .utils.colormap import InfCmap, get_cmap
+
+# %% ../nbs/05_repr_chans.ipynb 4
+def chans(  t: np.ndarray,      # Input tensor 
+            cmap = "coolwarm",  # Use matplotlib colormap by this name
+            cm_below="blue", cm_above="red",
+            cm_ninf="cyan", cm_pinf="fuchsia",
+            cm_nan="yellow",
+            gutter_px=3,   # Draw write gutters when tiling the images
+            frame_px=1,    # Draw black frame around each image
+            view_width=966):    
     """
     Process individual channels of a tensor that can be interpreted as as image
     `x` and `y` specify which dimensions should be used as spatial ones.
@@ -29,62 +28,10 @@ def _chans(t: np.ndarray,         # Input tensor
     if t.ndim == 2: t = t[None]
     
     ### XXX Do we want a way to pass a custom cmap instead of mpl one?
-    tcmap = InfCmap(cmap=get_cmap(cmap),
+    inf_cmap = InfCmap(cmap=get_cmap(cmap),
                   below=cm_below, above=cm_above,
                   nan=cm_nan, ninf=cm_ninf, pinf=cm_pinf)
 
-    return RGBProxy(tcmap(t))(cl=True, gutter_px=gutter_px, frame_px=frame_px, view_width=view_width)
+    return rgb(inf_cmap(t), cl=True, gutter_px=gutter_px, frame_px=frame_px, view_width=view_width)
 
-# %% ../nbs/05_repr_chans.ipynb 6
-class ChanProxy():
-    def __init__(self, t: np.ndarray):
-        self.t = t
-    
-    def __call__(self,
-                 cmap = "coolwarm", 
-                 cm_below="blue",
-                 cm_above="red",
-                 cm_ninf="cyan",
-                 cm_pinf="fuchsia",
-                 cm_nan="yellow",
-                 view_width=966,
-                 gutter_px=3,
-                 frame_px=1):
-        
-        return _chans(self.t,
-                     cmap=cmap,
-                     cm_below=cm_below,
-                     cm_above=cm_above,
-                     cm_ninf=cm_ninf,
-                     cm_pinf=cm_pinf,
-                     cm_nan=cm_nan,
-                     view_width=view_width,
-                     gutter_px=gutter_px,
-                     frame_px=frame_px)
-    
-    def _repr_png_(self):
-        return self.__call__()._repr_png_()
 
-# %% ../nbs/05_repr_chans.ipynb 7
-def chans(t: np.ndarray,      # Input, shape=([...], H, W)
-             cmap = "coolwarm", # Use matplotlib colormap by this name
-             cm_below="blue",   # Color for values below 0
-             cm_above="red",    # Color for values above 1
-             cm_ninf="cyan",    # Color for -inf values
-             cm_pinf="fuchsia", # Color for +inf values
-             cm_nan="yellow",   # Color for NaN values
-             view_width=966,    # Try to produce an image at most this wide
-             gutter_px=3,       # Draw write gutters when tiling the images
-             frame_px=1,        # Draw black frame around each image
-             cl=False):     
-
-    "Map tensor values to colors. RGB[A] color is added as channel-last"
-    return ChanProxy(t)(cmap=cmap,
-                         cm_below=cm_below,
-                         cm_above=cm_above,
-                         cm_ninf=cm_ninf,
-                         cm_pinf=cm_pinf,
-                         cm_nan=cm_nan,
-                         view_width=view_width,
-                         gutter_px=gutter_px,
-                         frame_px=frame_px)

@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['tile2d', 'hypertile']
 
-# %% ../../nbs/03c_utils.tile2d.ipynb 4
+# %% ../../nbs/03c_utils.tile2d.ipynb 3
 from math import floor, ceil, log2
 import numpy as np
 from .. import lovely
 from .pad import pad_frame_gutters
 
 
-# %% ../../nbs/03c_utils.tile2d.ipynb 9
+# %% ../../nbs/03c_utils.tile2d.ipynb 8
 def fit_columns(t: np.ndarray, # Tensor with images, shape=(n,h,w,c)
                 view_width=966):
     """Find out how many colums and rows to use to display the images"""
@@ -41,7 +41,7 @@ def fit_columns(t: np.ndarray, # Tensor with images, shape=(n,h,w,c)
 
     return (n_rows, n_cols)
 
-# %% ../../nbs/03c_utils.tile2d.ipynb 17
+# %% ../../nbs/03c_utils.tile2d.ipynb 16
 def tile2d(t: np.ndarray,      # Tensor containing images, shape=(n,h,w,c)
             view_width=966):   # Try to protuce an images at most this wide
     """
@@ -80,7 +80,7 @@ def tile2d(t: np.ndarray,      # Tensor containing images, shape=(n,h,w,c)
     
     return t
 
-# %% ../../nbs/03c_utils.tile2d.ipynb 23
+# %% ../../nbs/03c_utils.tile2d.ipynb 22
 def hypertile(t: np.ndarray, #torch.Tensor, # input tensor, shape=([...], B, H, W, C)
             frame_px=1,        # Frame width for the innermost group
             gutter_px=3,       # Gutter width for the innermost group

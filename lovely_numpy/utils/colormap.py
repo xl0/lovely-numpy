@@ -7,20 +7,34 @@ __all__ = ['InfCmap']
 from typing import Optional
 import numpy as np
 import matplotlib as mpl, matplotlib.cm as cm
-from matplotlib.colors import ListedColormap, to_rgba
+from matplotlib.colors import Colormap, to_rgba
 
 from .. import lovely
-from ..repr_rgb import RGBProxy, rgb
+from ..repr_rgb import rgb
+
+# %% ../../nbs/03a_utils.colormap.ipynb 5
+def get_cmap(cmap: str) -> Colormap:
+    # Matplotlib changed the colormap interface in version 3.6, and immediately
+    # marked the old one as deprecated with a warning. I want to suppot
+    # both for the time being, and avoid the warning for people using 3.6+.
+    major, minor, *rest = mpl.__version__.split(".")
+    assert int(major) == 3 # Drop this compat code when mpl is at 4.0
+
+    if int(minor) <= 5:
+        return cm.get_cmap(cmap)
+    else:
+        return mpl.colormaps[cmap]
+
 
 # %% ../../nbs/03a_utils.colormap.ipynb 17
 class InfCmap():
     """
-    Fast lut-based color mapping that can handle inf/nan in addition to the usual cmap range.
+    Matplotlib colormap extended to have colors for +/-inf
 
     Parameters extept `cmap` are matplotlib color strings.
     """
     def __init__(self,
-                 cmap: ListedColormap, # Base matplotlib colormap
+                 cmap:  Colormap, # Base matplotlib colormap
                  below: Optional[str] =None, # Values below 0
                  above: Optional[str] =None, # Values above 1
                  nan:   Optional[str] =None, # NaNs

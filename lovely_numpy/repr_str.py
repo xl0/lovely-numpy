@@ -10,7 +10,7 @@ from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, PRINT_OPTS, history_warning, sparse_join, np_to_str_common
+from .utils import pretty_str, PRINT_OPTS, history_warning, sparse_join, np_to_str_common, plain_repr
 
 # %% ../nbs/00_repr_str.ipynb 8
 dtnames =   {   "float16": "f16",
@@ -29,17 +29,6 @@ dtnames =   {   "float16": "f16",
 def short_dtype(x: Union[np.ndarray, np.generic]): return dtnames.get(x.dtype.name, str(x.dtype)[6:])
 
 # %% ../nbs/00_repr_str.ipynb 10
-def plain_repr(x):
-    "Pick the right function to get a plain repr. `x` is not limited to numpy"
-    # assert isinstance(x, np.ndarray), f"expected np.ndarray but got {type(x)}" # Could be a sub-class.
-    return x._plain_repr(x) if hasattr(type(x), "_plain_repr") else repr(x)
-
-def plain_str(x):
-    "Pick the right function to get a plain str. `x` is not limited to numpy"
-    # assert isinstance(x, np.ndarray), f"expected np.ndarray but got {type(x)}"
-    return x._plain_str(x) if hasattr(type(x), "_plain_str") else str(x)
-
-# %% ../nbs/00_repr_str.ipynb 11
 def np_to_str(x: Union[np.ndarray, np.generic],
             plain: bool=False,
             verbose: bool=False,
@@ -72,7 +61,7 @@ def np_to_str(x: Union[np.ndarray, np.generic],
 
     return res
 
-# %% ../nbs/00_repr_str.ipynb 13
+# %% ../nbs/00_repr_str.ipynb 12
 class StrProxy():
     def __init__(self, x: np.ndarray,
                     plain=False,
@@ -92,7 +81,7 @@ class StrProxy():
     def __call__(self, depth=1):
         return StrProxy(self.x, depth=depth)
 
-# %% ../nbs/00_repr_str.ipynb 15
+# %% ../nbs/00_repr_str.ipynb 14
 def lovely(x: np.ndarray, # Tensor of interest
             verbose=False,  # Whether to show the full tensor
             plain=False,    # Just print if exactly as before
