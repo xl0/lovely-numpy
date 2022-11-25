@@ -18,6 +18,7 @@ def chans(  t: np.ndarray,      # Input tensor
             cm_nan="yellow",
             gutter_px=3,   # Draw write gutters when tiling the images
             frame_px=1,    # Draw black frame around each image
+            scale=1,       # Stretch the image. Only itegers please.
             view_width=966):    
     """
     Process individual channels of a tensor that can be interpreted as as image
@@ -32,6 +33,5 @@ def chans(  t: np.ndarray,      # Input tensor
                   below=cm_below, above=cm_above,
                   nan=cm_nan, ninf=cm_ninf, pinf=cm_pinf)
 
-    return rgb(inf_cmap(t), cl=True, gutter_px=gutter_px, frame_px=frame_px, view_width=view_width)
-
+    return rgb(inf_cmap(t), cl=True, gutter_px=gutter_px, frame_px=frame_px, scale=scale, view_width=view_width)
 
