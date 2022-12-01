@@ -4,7 +4,6 @@
 __all__ = ['pad_frame', 'pad_frame_gutters']
 
 # %% ../../nbs/03b_utils.pad.ipynb 4
-from math import ceil
 import numpy as np
 
 # %% ../../nbs/03b_utils.pad.ipynb 6

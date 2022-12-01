@@ -10,9 +10,9 @@ from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, PRINT_OPTS, history_warning, sparse_join, np_to_str_common, plain_repr
+from .utils import pretty_str, PRINT_OPTS, history_warning, sparse_join, np_to_str_common
 
-# %% ../nbs/00_repr_str.ipynb 8
+# %% ../nbs/00_repr_str.ipynb 6
 dtnames =   {   "float16": "f16",
                 "float32": "f32",
                 "float64": "", # Default dtype in numpy
@@ -28,18 +28,23 @@ dtnames =   {   "float16": "f16",
 
 def short_dtype(x: Union[np.ndarray, np.generic]): return dtnames.get(x.dtype.name, str(x.dtype)[6:])
 
-# %% ../nbs/00_repr_str.ipynb 10
-def np_to_str(x: Union[np.ndarray, np.generic],
-            plain: bool=False,
-            verbose: bool=False,
-            depth=0,
-            lvl=0,
-            color=None) -> str:
+# %% ../nbs/00_repr_str.ipynb 9
+def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore 
+            plain: bool=False,               # Plain old way
+            verbose: bool=False,             # Both summaty and plain
+            depth=0,                         # Show deeper summary, up to `depth`
+            lvl=0,                           # Indentation level 
+            color=None                       # Override `PRINT_OPTIONS.color`
+            ) -> str:                        # The summary
 
     if plain or not np.isrealobj(x):
-        return plain_repr(x)
+        return repr(x)
     
-    tname = type(x).__name__.split(".")[-1] if isinstance(x, np.ndarray) else None
+    if isinstance(x, np.generic):
+        tname = None
+    else: 
+        tname = "array" if type(x) == np.ndarray else type(x).__name__.split(".")[-1]
+
     shape = str(list(x.shape)) if x.ndim else None
     type_str = sparse_join([tname, shape], sep="")
 
@@ -51,40 +56,12 @@ def np_to_str(x: Union[np.ndarray, np.generic],
     res = sparse_join([type_str, dtype, common, vals])
 
     if verbose:
-        res += "\n" + plain_repr(x)
+        res += "\n" + repr(x)
 
     if depth and x.ndim > 1:
         res += "\n" + "\n".join([
             " "*PRINT_OPTS.indent*(lvl+1) +
-            str(np_to_str(x[i,:], depth=depth-1, lvl=lvl+1))
+            str(lovely(x[i,:], depth=depth-1, lvl=lvl+1))
             for i in range(x.shape[0])])
 
     return res
-
-# %% ../nbs/00_repr_str.ipynb 12
-class StrProxy():
-    def __init__(self, x: np.ndarray,
-                    plain=False,
-                    verbose=False,
-                    depth=0,
-                    lvl=0,
-                    color=None):
-        store_attr()
-        history_warning()
-    
-    def __repr__(self):
-        return np_to_str(self.x, plain=self.plain, verbose=self.verbose,
-                      depth=self.depth, lvl=self.lvl, color=self.color)
-
-    # This is used for .deeper attribute and .deeper(depth=...).
-    # The second onthe results in a __call__.
-    def __call__(self, depth=1):
-        return StrProxy(self.x, depth=depth)
-
-# %% ../nbs/00_repr_str.ipynb 14
-def lovely(x: np.ndarray, # Tensor of interest
-            verbose=False,  # Whether to show the full tensor
-            plain=False,    # Just print if exactly as before
-            depth=0,        # Show stats in depth
-            color=None):    # Force color (True/False) or auto.
-    return StrProxy(x, verbose=verbose, plain=plain, depth=depth, color=color)

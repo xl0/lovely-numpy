@@ -5,7 +5,6 @@ __all__ = ['chans']
 
 # %% ../nbs/05_repr_chans.ipynb 3
 import numpy as np
-from . import lovely
 
 from .repr_rgb import rgb
 from .utils.colormap import InfCmap, get_cmap
@@ -19,6 +18,7 @@ def chans(  t: np.ndarray,      # Input tensor
             gutter_px=3,   # Draw write gutters when tiling the images
             frame_px=1,    # Draw black frame around each image
             scale=1,       # Stretch the image. Only itegers please.
+            cl=True,
             view_width=966):    
     """
     Process individual channels of a tensor that can be interpreted as as image
@@ -28,6 +28,9 @@ def chans(  t: np.ndarray,      # Input tensor
     assert t.ndim >= 2, f"Expected a 2 or 3-dim input, got {t.shape}={t.ndim}"
     if t.ndim == 2: t = t[None]
     
+    if cl: # Convert to [..., C, H, W].
+        t = np.swapaxes(np.swapaxes(t, -2, -1), -3, -2)
+
     ### XXX Do we want a way to pass a custom cmap instead of mpl one?
     inf_cmap = InfCmap(cmap=get_cmap(cmap),
                   below=cm_below, above=cm_above,

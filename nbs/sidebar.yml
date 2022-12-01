@@ -15,4 +15,4 @@ website:
           - 03c_utils.tile2d.ipynb
       - section: ✨ Misc
         contents:
-          - 10_patch.ipynb
+          - 10_lo.ipynb

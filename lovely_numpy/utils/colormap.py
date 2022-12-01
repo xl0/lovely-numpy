@@ -9,7 +9,6 @@ import numpy as np
 import matplotlib as mpl, matplotlib.cm as cm
 from matplotlib.colors import Colormap, to_rgba
 
-from .. import lovely
 from ..repr_rgb import rgb
 
 # %% ../../nbs/03a_utils.colormap.ipynb 5

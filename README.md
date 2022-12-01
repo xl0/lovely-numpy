@@ -17,37 +17,38 @@ pip install lovely-numpy
 
 ## How to use
 
-How often do you find yourself debugging NumPy code? You dump a tensor
-to the cell output, and see this:
+How often do you find yourself debugging NumPy code? You dump your
+variable to the cell output, and see this:
 
 ``` python
 numbers
 ```
 
-    array([[[-0.3541, -0.3369, -0.4054, ..., -0.5596, -0.4739,  2.2489],
-            [-0.4054, -0.4226, -0.4911, ..., -0.9192, -0.8507,  2.1633],
-            [-0.4739, -0.4739, -0.5424, ..., -1.039 , -1.039 ,  2.1975],
+    array([[[-0.3541, -0.1975, -0.6715],
+            [-0.3369, -0.1975, -0.9853],
             ...,
-            [-0.902 , -0.8335, -0.9363, ..., -1.4672, -1.2959,  2.2318],
-            [-0.8507, -0.7822, -0.9363, ..., -1.6042, -1.5014,  2.1804],
-            [-0.8335, -0.8164, -0.9705, ..., -1.6555, -1.5528,  2.1119]],
+            [-0.4739, -0.3725, -0.689 ],
+            [ 2.2489,  2.4111,  2.396 ]],
 
-           [[-0.1975, -0.1975, -0.3025, ..., -0.4776, -0.3725,  2.4111],
-            [-0.25  , -0.2325, -0.3375, ..., -0.7052, -0.6702,  2.3585],
-            [-0.3025, -0.285 , -0.3901, ..., -0.7402, -0.8102,  2.3761],
+           [[-0.4054, -0.25  , -0.7238],
+            [-0.4226, -0.2325, -1.0724],
             ...,
-            [-0.4251, -0.2325, -0.3725, ..., -1.0903, -1.0203,  2.4286],
-            [-0.3901, -0.2325, -0.4251, ..., -1.2304, -1.2304,  2.4111],
-            [-0.4076, -0.285 , -0.4776, ..., -1.2829, -1.2829,  2.341 ]],
+            [-0.8507, -0.6702, -1.0201],
+            [ 2.1633,  2.3585,  2.3263]],
 
-           [[-0.6715, -0.9853, -0.8807, ..., -0.9678, -0.689 ,  2.396 ],
-            [-0.7238, -1.0724, -0.9678, ..., -1.2467, -1.0201,  2.3263],
-            [-0.8284, -1.1247, -1.0201, ..., -1.2641, -1.1596,  2.3786],
+           ...,
+
+           [[-0.8507, -0.3901, -1.1944],
+            [-0.7822, -0.2325, -1.4559],
             ...,
-            [-1.2293, -1.4733, -1.3861, ..., -1.5081, -1.2641,  2.518 ],
-            [-1.1944, -1.4559, -1.421 , ..., -1.6476, -1.4733,  2.4308],
-            [-1.2293, -1.5256, -1.5081, ..., -1.6824, -1.5256,  2.3611]]],
-          dtype=float32)
+            [-1.5014, -1.2304, -1.4733],
+            [ 2.1804,  2.4111,  2.4308]],
+
+           [[-0.8335, -0.4076, -1.2293],
+            [-0.8164, -0.285 , -1.5256],
+            ...,
+            [-1.5528, -1.2829, -1.5256],
+            [ 2.1119,  2.341 ,  2.3611]]], dtype=float32)
 
 Was it really useful for you, as a human, to see all these numbers?
 
@@ -57,24 +58,24 @@ Are any of the values `nan` or `inf`?
 Is it an image of a man holding a tench?
 
 ``` python
-from lovely_numpy import lovely, rgb, chans
+from lovely_numpy import Lo
 ```
 
-## `lovely()`
+## <code>Lo</code> and behold!
 
 ``` python
-lovely(numbers)
+Lo(numbers)
 ```
 
-    ndarray[3, 196, 196] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+    array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
 
 Better, eh?
 
 ``` python
-lovely(numbers[1,:6,1]) # Still shows values if there are not too many.
+Lo(numbers[1,:6,1]) # Still shows values if there are not too many.
 ```
 
-    ndarray[6] f32 x∈[-0.443, -0.197] μ=-0.311 σ=0.083 [-0.197, -0.232, -0.285, -0.373, -0.443, -0.338]
+    array[6] f32 x∈[-0.408, -0.232] μ=-0.340 σ=0.075 [-0.250, -0.232, -0.338, -0.408, -0.408, -0.408]
 
 ``` python
 spicy = numbers[0,:12,0].copy()
@@ -86,66 +87,65 @@ spicy[3] = float('-inf')
 spicy[4] = float('nan')
 
 spicy = spicy.reshape((2,6))
-lovely(spicy) # Spicy stuff
+Lo(spicy) # Spicy stuff
 ```
 
-    ndarray[2, 6] f32 n=12 x∈[-3.541e+03, -4.054e-05] μ=-393.842 σ=1.113e+03 +Inf! -Inf! NaN!
+    array[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!
 
 ``` python
-lovely(np.zeros((10, 10))) # A zero array - make it obvious
+Lo(np.zeros((10, 10))) # A zero array - make it obvious
 ```
 
-    ndarray[10, 10] all_zeros
+    array[10, 10] all_zeros
 
 ``` python
-lovely(spicy, verbose=True)
+Lo(spicy, verbose=True)
 ```
 
-    ndarray[2, 6] f32 n=12 x∈[-3.541e+03, -4.054e-05] μ=-393.842 σ=1.113e+03 +Inf! -Inf! NaN!
-    array([[-3.5405e+03, -4.0543e-05,         inf,        -inf,         nan,
-            -6.1093e-01],
-           [-6.1093e-01, -5.9380e-01, -5.9380e-01, -5.4243e-01, -5.4243e-01,
-            -5.4243e-01]], dtype=float32)
+    array[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!
+    array([[-3540.5432,    -0.    , ...,        nan,    -0.4054],
+           [   -0.4226,    -0.4911, ...,    -0.5424,    -0.5082]],
+          dtype=float32)
 
 ## Going `.deeper`
 
 ``` python
-lovely(numbers, depth=1)
+Lo(numbers.transpose(2,1,0), depth=1)
 ```
 
-    ndarray[3, 196, 196] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
-      ndarray[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036
-      ndarray[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973
-      ndarray[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178
+    array[3, 196, 196] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+      array[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036
+      array[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973
+      array[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178
 
 ``` python
 # You can go deeper if you need to
-lovely(numbers[:,:3,:5], depth=2)
+Lo(numbers[:3,:3,:5], depth=2)
 ```
 
-    ndarray[3, 3, 5] f32 n=45 x∈[-1.316, -0.197] μ=-0.593 σ=0.302
-      ndarray[3, 5] f32 n=15 x∈[-0.765, -0.337] μ=-0.492 σ=0.119
-        ndarray[5] f32 x∈[-0.440, -0.337] μ=-0.385 σ=0.037 [-0.354, -0.337, -0.405, -0.440, -0.388]
-        ndarray[5] f32 x∈[-0.662, -0.405] μ=-0.512 σ=0.097 [-0.405, -0.423, -0.491, -0.577, -0.662]
-        ndarray[5] f32 x∈[-0.765, -0.474] μ=-0.580 σ=0.112 [-0.474, -0.474, -0.542, -0.645, -0.765]
-      ndarray[3, 5] f32 n=15 x∈[-0.513, -0.197] μ=-0.321 σ=0.096
-        ndarray[5] f32 x∈[-0.303, -0.197] μ=-0.243 σ=0.049 [-0.197, -0.197, -0.303, -0.303, -0.215]
-        ndarray[5] f32 x∈[-0.408, -0.232] μ=-0.327 σ=0.075 [-0.250, -0.232, -0.338, -0.408, -0.408]
-        ndarray[5] f32 x∈[-0.513, -0.285] μ=-0.394 σ=0.091 [-0.303, -0.285, -0.390, -0.478, -0.513]
-      ndarray[3, 5] f32 n=15 x∈[-1.316, -0.672] μ=-0.964 σ=0.170
-        ndarray[5] f32 x∈[-0.985, -0.672] μ=-0.846 σ=0.110 [-0.672, -0.985, -0.881, -0.776, -0.916]
-        ndarray[5] f32 x∈[-1.212, -0.724] μ=-0.989 σ=0.160 [-0.724, -1.072, -0.968, -0.968, -1.212]
-        ndarray[5] f32 x∈[-1.316, -0.828] μ=-1.058 σ=0.160 [-0.828, -1.125, -1.020, -1.003, -1.316]
+    array[3, 3, 3] f32 n=27 x∈[-1.125, -0.197] μ=-0.544 σ=0.291
+      array[3, 3] f32 n=9 x∈[-0.985, -0.197] μ=-0.481 σ=0.276 [[-0.354, -0.197, -0.672], [-0.337, -0.197, -0.985], [-0.405, -0.303, -0.881]]
+        array[3] f32 x∈[-0.672, -0.197] μ=-0.408 σ=0.197 [-0.354, -0.197, -0.672]
+        array[3] f32 x∈[-0.985, -0.197] μ=-0.507 σ=0.343 [-0.337, -0.197, -0.985]
+        array[3] f32 x∈[-0.881, -0.303] μ=-0.530 σ=0.252 [-0.405, -0.303, -0.881]
+      array[3, 3] f32 n=9 x∈[-1.072, -0.232] μ=-0.545 σ=0.289 [[-0.405, -0.250, -0.724], [-0.423, -0.232, -1.072], [-0.491, -0.338, -0.968]]
+        array[3] f32 x∈[-0.724, -0.250] μ=-0.460 σ=0.197 [-0.405, -0.250, -0.724]
+        array[3] f32 x∈[-1.072, -0.232] μ=-0.576 σ=0.360 [-0.423, -0.232, -1.072]
+        array[3] f32 x∈[-0.968, -0.338] μ=-0.599 σ=0.268 [-0.491, -0.338, -0.968]
+      array[3, 3] f32 n=9 x∈[-1.125, -0.285] μ=-0.605 σ=0.293 [[-0.474, -0.303, -0.828], [-0.474, -0.285, -1.125], [-0.542, -0.390, -1.020]]
+        array[3] f32 x∈[-0.828, -0.303] μ=-0.535 σ=0.219 [-0.474, -0.303, -0.828]
+        array[3] f32 x∈[-1.125, -0.285] μ=-0.628 σ=0.360 [-0.474, -0.285, -1.125]
+        array[3] f32 x∈[-1.020, -0.390] μ=-0.651 σ=0.268 [-0.542, -0.390, -1.020]
 
 ## Now in `.rgb` color
 
 The important queston - is it our man?
 
 ``` python
-rgb(numbers, cl=0)
+Lo(numbers).rgb
 ```
 
-![](index_files/figure-gfm/cell-11-output-1.png)
+![](index_files/figure-gfm/cell-12-output-1.png)
 
 *Maaaaybe?* Looks like someone normalized him.
 
@@ -154,10 +154,10 @@ in_stats = ( (0.485, 0.456, 0.406),     # mean
              (0.229, 0.224, 0.225) )    # std
 
 # numbers.rgb(in_stats, cl=True) # For channel-last input format
-rgb(numbers, denorm=in_stats, cl=0)
+Lo(numbers).rgb(denorm=in_stats)
 ```
 
-![](index_files/figure-gfm/cell-12-output-1.png)
+![](index_files/figure-gfm/cell-13-output-1.png)
 
 It’s indeed our hero, the Tenchman!
 
@@ -166,19 +166,19 @@ It’s indeed our hero, the Tenchman!
 ``` python
 # .chans will map values betwen [0,1] to colors.
 # Make our values fit into that range to avoid clipping.
-mean = np.array(in_stats[0])[:,None,None]
-std = np.array(in_stats[1])[:,None,None]
+mean = np.array(in_stats[0])
+std = np.array(in_stats[1])
 numbers_01 = (numbers*std + mean)
-lovely(numbers_01)
+Lo(numbers_01)
 ```
 
-    ndarray[3, 196, 196] n=115248 x∈[-4.053e-09, 1.000] μ=0.361 σ=0.248
+    array[196, 196, 3] n=115248 x∈[-4.053e-09, 1.000] μ=0.361 σ=0.248
 
 ``` python
-chans(numbers_01)
+Lo(numbers_01).chans
 ```
 
-![](index_files/figure-gfm/cell-14-output-1.png)
+![](index_files/figure-gfm/cell-15-output-1.png)
 
 ## Grouping (`.rgb` and `.chans` )
 
@@ -186,17 +186,41 @@ chans(numbers_01)
 # Make 8 images with progressively higher brightness and stack them 2x2x2.
 eight_images = (np.stack([numbers]*8) + np.linspace(-2, 2, 8)[:,None,None,None])
 eight_images = (eight_images
-                     *np.array(in_stats[1])[:,None,None]
-                     +np.array(in_stats[0])[:,None,None]
-                ).clip(0,1).reshape(2,2,2,3,196,196)
+                     *np.array(in_stats[1])
+                     +np.array(in_stats[0])
+                ).clip(0,1).reshape(2,2,2,196,196,3)
             
-lovely(eight_images)
+Lo(eight_images)
 ```
 
-    ndarray[2, 2, 2, 3, 196, 196] n=921984 x∈[0., 1.000] μ=0.382 σ=0.319
+    array[2, 2, 2, 196, 196, 3] n=921984 x∈[0., 1.000] μ=0.382 σ=0.319
 
 ``` python
-rgb(eight_images, cl=0)
+Lo(eight_images).rgb
 ```
 
-![](index_files/figure-gfm/cell-16-output-1.png)
+![](index_files/figure-gfm/cell-17-output-1.png)
+
+## Without [`Lo`](https://xl0.github.io/lovely-numpy/lo.html#lo)
+
+``` python
+from lovely_numpy import lovely, rgb, chans
+```
+
+``` python
+print(lovely(numbers))
+```
+
+    array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+
+``` python
+rgb(numbers, denorm=in_stats)
+```
+
+![](index_files/figure-gfm/cell-20-output-1.png)
+
+``` python
+chans(numbers*0.3+0.5)
+```
+
+![](index_files/figure-gfm/cell-21-output-1.png)

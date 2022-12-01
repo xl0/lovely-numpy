@@ -6,7 +6,6 @@ __all__ = ['tile2d', 'hypertile']
 # %% ../../nbs/03c_utils.tile2d.ipynb 3
 from math import floor, ceil, log2
 import numpy as np
-from .. import lovely
 from .pad import pad_frame_gutters
 
 
