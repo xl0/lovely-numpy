@@ -4,6 +4,8 @@
 __all__ = ['Lo']
 
 # %% ../nbs/10_lo.ipynb 3
+from typing import Union
+
 import numpy as np
 from fastcore.all import store_attr
 
@@ -70,36 +72,41 @@ class ChanProxy():
 # %% ../nbs/10_lo.ipynb 6
 class Lo():
     """Lo and behold! What a lovely `numpy.ndarray`!"""
-    def __init__(self, x: np.ndarray,
-                    plain=False,
-                    verbose=False,
-                    depth=0,
-                    color=None):
+    def __init__(self, x: Union[np.ndarray, np.generic],    # Your data
+                    plain       =False, # Show as plain text - values only
+                    verbose     =False, # Verbose - show values too
+                    depth       =0,     # Expand up to `depth`
+                    color :bool =None): # Use ANSI colors
         store_attr()
         history_warning()
-    
+
     def __repr__(self):
         return lovely(self.x, plain=self.plain, verbose=self.verbose,
                       depth=self.depth, color=self.color)
 
     @property
     def v(self):
+        "Verbose"
         return Lo(self.x, verbose=True, color=self.color)
 
     @property
     def p(self):
+        "Good old plain representation"
         return Lo(self.x, plain=True, color=self.color)
 
     @property
     def deeper(self):
+        "Going deeper"
         return Lo(self.x, verbose=False, plain=False, depth=1, color=self.color)
 
     @property
     def rgb(self):
+        "Show an image"
         return RGBProxy(self.x)
 
     @property
     def chans(self):
+        "Show color channels"
         return ChanProxy(self.x)
 
     # This is used for .deeper attribute and .deeper(depth=...).

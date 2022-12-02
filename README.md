@@ -180,7 +180,7 @@ Lo(numbers_01).chans
 
 ![](index_files/figure-gfm/cell-15-output-1.png)
 
-## Grouping (`.rgb` and `.chans` )
+## Grouping
 
 ``` python
 # Make 8 images with progressively higher brightness and stack them 2x2x2.
@@ -201,26 +201,26 @@ Lo(eight_images).rgb
 
 ![](index_files/figure-gfm/cell-17-output-1.png)
 
-## Without [`Lo`](https://xl0.github.io/lovely-numpy/lo.html#lo)
+## Without <code>Lo</code>
 
 ``` python
 from lovely_numpy import lovely, rgb, chans
 ```
 
 ``` python
-print(lovely(numbers))
+lovely(numbers) # Returns `str`. `Lo(x)` returns a wrapper object with a `__repr__` and other methods.
 ```
 
-    array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+    'array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
 
 ``` python
-rgb(numbers, denorm=in_stats)
+rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like Lo(x).rgb
 ```
 
 ![](index_files/figure-gfm/cell-20-output-1.png)
 
 ``` python
-chans(numbers*0.3+0.5)
+chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
 ```
 
 ![](index_files/figure-gfm/cell-21-output-1.png)

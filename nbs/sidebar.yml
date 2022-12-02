@@ -16,3 +16,4 @@ website:
       - section: ✨ Misc
         contents:
           - 10_lo.ipynb
+          - 03d_utils.config.ipynb

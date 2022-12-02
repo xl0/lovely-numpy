@@ -10,9 +10,10 @@ from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, PRINT_OPTS, history_warning, sparse_join, np_to_str_common
+from .utils import pretty_str, history_warning, sparse_join, np_to_str_common
+from .utils.config import get_config
 
-# %% ../nbs/00_repr_str.ipynb 6
+# %% ../nbs/00_repr_str.ipynb 5
 dtnames =   {   "float16": "f16",
                 "float32": "f32",
                 "float64": "", # Default dtype in numpy
@@ -28,14 +29,16 @@ dtnames =   {   "float16": "f16",
 
 def short_dtype(x: Union[np.ndarray, np.generic]): return dtnames.get(x.dtype.name, str(x.dtype)[6:])
 
-# %% ../nbs/00_repr_str.ipynb 9
+# %% ../nbs/00_repr_str.ipynb 8
 def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore 
             plain: bool=False,               # Plain old way
             verbose: bool=False,             # Both summaty and plain
             depth=0,                         # Show deeper summary, up to `depth`
             lvl=0,                           # Indentation level 
-            color=None                       # Override `PRINT_OPTIONS.color`
+            color: bool=None                 # Override `get_config().color`
             ) -> str:                        # The summary
+
+    "Pretty-print the stats of a numpy array or scalar"
 
     if plain or not np.isrealobj(x):
         return repr(x)
@@ -48,7 +51,7 @@ def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore
     shape = str(list(x.shape)) if x.ndim else None
     type_str = sparse_join([tname, shape], sep="")
 
-    color = PRINT_OPTS.color if color is None else color
+    color = get_config().color if color is None else color
     common = np_to_str_common(x, color=color)
     dtype = short_dtype(x)
     
@@ -60,7 +63,7 @@ def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore
 
     if depth and x.ndim > 1:
         res += "\n" + "\n".join([
-            " "*PRINT_OPTS.indent*(lvl+1) +
+            " " * get_config().indent * (lvl+1) +
             str(lovely(x[i,:], depth=depth-1, lvl=lvl+1))
             for i in range(x.shape[0])])
 
