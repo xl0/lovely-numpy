@@ -207,7 +207,7 @@ See [docs](https://xl0.github.io/lovely-numpy/03d_utils.config.html) for
 more
 
 ``` python
-from lovely_numpy import set_config, config
+from lovely_numpy import set_config, config, lovely
 ```
 
 ``` python
@@ -235,36 +235,12 @@ print(Lo(np.array([1,2,3])))
     array[3] i64 x∈[1, 3] μ=2.000e+00 σ=8.165e-01 [1, 2, 3]
     array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
 
-## Without <code>Lo</code>
-
-``` python
-from lovely_numpy import lovely, rgb, chans
-```
-
-``` python
-lovely(numbers) # Returns `str`. `Lo(x)` returns a wrapper object with a `__repr__` and other methods.
-```
-
-    'array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
-
-``` python
-rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like Lo(x).rgb
-```
-
-![](index_files/figure-gfm/cell-23-output-1.png)
-
-``` python
-chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
-```
-
-![](index_files/figure-gfm/cell-24-output-1.png)
-
 ## Default `str` and `repr`
 
 ``` python
 set_config(repr=lovely)
-print(np.array([1, 2, 3]))
-print(repr(np.array([1, 2, 3]))) # Note - both str (used by print) and repr do the same thing. See docs.
+print(np.array([1, 2, 3])) # Note: print() calls str(). Cell output is repr()
+print(repr(np.array([1, 2, 3]))) # See docs if you want to only set `repr`` or `str``
 ```
 
     array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
@@ -275,3 +251,28 @@ Lo(np.array([1, 2, 3])).p # To see the plain values
 ```
 
     array([1, 2, 3])
+
+## Without <code>Lo</code>
+
+``` python
+from lovely_numpy import rgb, chans
+```
+
+``` python
+lovely(numbers) # Returns `str`
+# Note:  Lo(x) returns a wrapper object with a `__repr__` and other methods.
+```
+
+    'array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
+
+``` python
+rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like Lo(x).rgb
+```
+
+![](index_files/figure-gfm/cell-25-output-1.png)
+
+``` python
+chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
+```
+
+![](index_files/figure-gfm/cell-26-output-1.png)
