@@ -145,7 +145,7 @@ The important queston - is it our man?
 Lo(numbers).rgb
 ```
 
-![](index_files/figure-gfm/cell-12-output-1.png)
+![](index_files/figure-gfm/cell-11-output-1.png)
 
 *Maaaaybe?* Looks like someone normalized him.
 
@@ -157,7 +157,7 @@ in_stats = ( (0.485, 0.456, 0.406),     # mean
 Lo(numbers).rgb(denorm=in_stats)
 ```
 
-![](index_files/figure-gfm/cell-13-output-1.png)
+![](index_files/figure-gfm/cell-12-output-1.png)
 
 It’s indeed our hero, the Tenchman!
 
@@ -178,7 +178,7 @@ Lo(numbers_01)
 Lo(numbers_01).chans
 ```
 
-![](index_files/figure-gfm/cell-15-output-1.png)
+![](index_files/figure-gfm/cell-14-output-1.png)
 
 ## Grouping
 
@@ -199,7 +199,41 @@ Lo(eight_images)
 Lo(eight_images).rgb
 ```
 
-![](index_files/figure-gfm/cell-17-output-1.png)
+![](index_files/figure-gfm/cell-16-output-1.png)
+
+## Options
+
+See [docs](https://xl0.github.io/lovely-numpy/03d_utils.config.html) for
+more
+
+``` python
+from lovely_numpy import set_config, config
+```
+
+``` python
+set_config(precision=5, sci_mode=True, color=False)
+Lo(np.array([1.,2,np.nan]))
+```
+
+    array[3] μ=1.50000e+00 σ=5.00000e-01 NaN! [1.00000e+00, 2.00000e+00, nan]
+
+``` python
+set_config(precision=None, sci_mode=None, color=None) # None -> Reset to defaults
+Lo(np.array([1.,2,np.nan]))
+```
+
+    array[3] μ=1.500 σ=0.500 NaN! [1.000, 2.000, nan]
+
+``` python
+# Or with config context manager.
+with config(sci_mode=True):
+    print(Lo(np.array([1,2,3])))
+
+print(Lo(np.array([1,2,3])))
+```
+
+    array[3] i64 x∈[1, 3] μ=2.000e+00 σ=8.165e-01 [1, 2, 3]
+    array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
 
 ## Without <code>Lo</code>
 
@@ -217,10 +251,27 @@ lovely(numbers) # Returns `str`. `Lo(x)` returns a wrapper object with a `__repr
 rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like Lo(x).rgb
 ```
 
-![](index_files/figure-gfm/cell-20-output-1.png)
+![](index_files/figure-gfm/cell-23-output-1.png)
 
 ``` python
 chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
 ```
 
-![](index_files/figure-gfm/cell-21-output-1.png)
+![](index_files/figure-gfm/cell-24-output-1.png)
+
+## Default `str` and `repr`
+
+``` python
+set_config(repr=lovely)
+print(np.array([1, 2, 3]))
+print(repr(np.array([1, 2, 3]))) # Note - both str (used by print) and repr do the same thing. See docs.
+```
+
+    array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
+    array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
+
+``` python
+Lo(np.array([1, 2, 3])).p # To see the plain values
+```
+
+    array([1, 2, 3])

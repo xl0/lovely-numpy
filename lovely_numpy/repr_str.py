@@ -10,8 +10,8 @@ from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, history_warning, sparse_join, np_to_str_common
-from .utils.config import get_config
+from .utils import pretty_str, sparse_join, np_to_str_common
+from .utils.config import get_config, set_config, config
 
 # %% ../nbs/00_repr_str.ipynb 5
 dtnames =   {   "float16": "f16",
@@ -30,6 +30,11 @@ dtnames =   {   "float16": "f16",
 def short_dtype(x: Union[np.ndarray, np.generic]): return dtnames.get(x.dtype.name, str(x.dtype)[6:])
 
 # %% ../nbs/00_repr_str.ipynb 8
+def plain_repr(x):
+    with config(repr=None):
+        return repr(x)
+
+# %% ../nbs/00_repr_str.ipynb 9
 def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore 
             plain: bool=False,               # Plain old way
             verbose: bool=False,             # Both summaty and plain
@@ -41,7 +46,7 @@ def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore
     "Pretty-print the stats of a numpy array or scalar"
 
     if plain or not np.isrealobj(x):
-        return repr(x)
+        return plain_repr(x)
     
     if isinstance(x, np.generic):
         tname = None
@@ -59,7 +64,7 @@ def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore
     res = sparse_join([type_str, dtype, common, vals])
 
     if verbose:
-        res += "\n" + repr(x)
+        res += "\n" + plain_repr(x)
 
     if depth and x.ndim > 1:
         res += "\n" + "\n".join([
