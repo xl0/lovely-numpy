@@ -164,7 +164,7 @@ It’s indeed our hero, the Tenchman!
 ## See the `.chans`
 
 ``` python
-# .chans will map values betwen [0,1] to colors.
+# .chans will map values betwen [-1,1] to colors.
 # Make our values fit into that range to avoid clipping.
 mean = np.array(in_stats[0])
 std = np.array(in_stats[1])
