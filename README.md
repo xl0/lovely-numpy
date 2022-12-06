@@ -58,13 +58,13 @@ Are any of the values `nan` or `inf`?
 Is it an image of a man holding a tench?
 
 ``` python
-from lovely_numpy import Lo
+from lovely_numpy import lo
 ```
 
 ## <code>Lo</code> and behold!
 
 ``` python
-Lo(numbers)
+lo(numbers)
 ```
 
     array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
@@ -72,7 +72,7 @@ Lo(numbers)
 Better, eh?
 
 ``` python
-Lo(numbers[1,:6,1]) # Still shows values if there are not too many.
+lo(numbers[1,:6,1]) # Still shows values if there are not too many.
 ```
 
     array[6] f32 x∈[-0.408, -0.232] μ=-0.340 σ=0.075 [-0.250, -0.232, -0.338, -0.408, -0.408, -0.408]
@@ -87,19 +87,19 @@ spicy[3] = float('-inf')
 spicy[4] = float('nan')
 
 spicy = spicy.reshape((2,6))
-Lo(spicy) # Spicy stuff
+lo(spicy) # Spicy stuff
 ```
 
     array[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!
 
 ``` python
-Lo(np.zeros((10, 10))) # A zero array - make it obvious
+lo(np.zeros((10, 10))) # A zero array - make it obvious
 ```
 
     array[10, 10] all_zeros
 
 ``` python
-Lo(spicy, verbose=True)
+lo(spicy, verbose=True)
 ```
 
     array[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!
@@ -110,7 +110,7 @@ Lo(spicy, verbose=True)
 ## Going `.deeper`
 
 ``` python
-Lo(numbers.transpose(2,1,0), depth=1)
+lo(numbers.transpose(2,1,0), depth=1)
 ```
 
     array[3, 196, 196] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
@@ -120,7 +120,7 @@ Lo(numbers.transpose(2,1,0), depth=1)
 
 ``` python
 # You can go deeper if you need to
-Lo(numbers[:3,:3,:5], depth=2)
+lo(numbers[:3,:3,:5], depth=2)
 ```
 
     array[3, 3, 3] f32 n=27 x∈[-1.125, -0.197] μ=-0.544 σ=0.291
@@ -142,7 +142,7 @@ Lo(numbers[:3,:3,:5], depth=2)
 The important queston - is it our man?
 
 ``` python
-Lo(numbers).rgb
+lo(numbers).rgb
 ```
 
 ![](index_files/figure-gfm/cell-11-output-1.png)
@@ -154,7 +154,7 @@ in_stats = ( (0.485, 0.456, 0.406),     # mean
              (0.229, 0.224, 0.225) )    # std
 
 # numbers.rgb(in_stats, cl=True) # For channel-last input format
-Lo(numbers).rgb(denorm=in_stats)
+lo(numbers).rgb(denorm=in_stats)
 ```
 
 ![](index_files/figure-gfm/cell-12-output-1.png)
@@ -168,14 +168,14 @@ It’s indeed our hero, the Tenchman!
 # Make our values fit into that range to avoid clipping.
 mean = np.array(in_stats[0])
 std = np.array(in_stats[1])
-numbers_01 = (numbers*std + mean)
-Lo(numbers_01)
+numbers_01 = (numbers*std + mean).clip(0,1)
+lo(numbers_01)
 ```
 
-    array[196, 196, 3] n=115248 x∈[-4.053e-09, 1.000] μ=0.361 σ=0.248
+    array[196, 196, 3] n=115248 x∈[0., 1.000] μ=0.361 σ=0.248
 
 ``` python
-Lo(numbers_01).chans
+lo(numbers_01).chans
 ```
 
 ![](index_files/figure-gfm/cell-14-output-1.png)
@@ -190,13 +190,13 @@ eight_images = (eight_images
                      +np.array(in_stats[0])
                 ).clip(0,1).reshape(2,2,2,196,196,3)
             
-Lo(eight_images)
+lo(eight_images)
 ```
 
     array[2, 2, 2, 196, 196, 3] n=921984 x∈[0., 1.000] μ=0.382 σ=0.319
 
 ``` python
-Lo(eight_images).rgb
+lo(eight_images).rgb
 ```
 
 ![](index_files/figure-gfm/cell-16-output-1.png)
@@ -212,14 +212,14 @@ from lovely_numpy import set_config, config, lovely
 
 ``` python
 set_config(precision=5, sci_mode=True, color=False)
-Lo(np.array([1.,2,np.nan]))
+lo(np.array([1.,2,np.nan]))
 ```
 
     array[3] μ=1.50000e+00 σ=5.00000e-01 NaN! [1.00000e+00, 2.00000e+00, nan]
 
 ``` python
 set_config(precision=None, sci_mode=None, color=None) # None -> Reset to defaults
-Lo(np.array([1.,2,np.nan]))
+lo(np.array([1.,2,np.nan]))
 ```
 
     array[3] μ=1.500 σ=0.500 NaN! [1.000, 2.000, nan]
@@ -227,9 +227,9 @@ Lo(np.array([1.,2,np.nan]))
 ``` python
 # Or with config context manager.
 with config(sci_mode=True):
-    print(Lo(np.array([1,2,3])))
+    print(lo(np.array([1,2,3])))
 
-print(Lo(np.array([1,2,3])))
+print(lo(np.array([1,2,3])))
 ```
 
     array[3] i64 x∈[1, 3] μ=2.000e+00 σ=8.165e-01 [1, 2, 3]
@@ -247,7 +247,7 @@ print(repr(np.array([1, 2, 3]))) # See docs if you want to only set `repr`` or `
     array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
 
 ``` python
-Lo(np.array([1, 2, 3])).p # To see the plain values
+lo(np.array([1, 2, 3])).p # To see the plain values
 ```
 
     array([1, 2, 3])
@@ -259,14 +259,14 @@ from lovely_numpy import rgb, chans
 ```
 
 ``` python
-lovely(numbers) # Returns `str`
-# Note:  Lo(x) returns a wrapper object with a `__repr__` and other methods.
+lovely(numbers) # Returns `str`, that's why you see ''.
+# Note:  lo(x) returns a wrapper object with a `__repr__` and other methods.
 ```
 
     'array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
 
 ``` python
-rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like Lo(x).rgb
+rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like lo(x).rgb
 ```
 
 ![](index_files/figure-gfm/cell-25-output-1.png)

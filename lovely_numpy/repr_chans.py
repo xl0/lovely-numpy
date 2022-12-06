@@ -11,7 +11,7 @@ from .utils.colormap import InfCmap, get_cmap
 
 # %% ../nbs/05_repr_chans.ipynb 4
 def chans(  t: np.ndarray,      # Input tensor 
-            cmap = "coolwarm",  # Use matplotlib colormap by this name
+            cmap = "twilight",  # Use matplotlib colormap by this name
             cm_below="blue", cm_above="red",
             cm_ninf="cyan", cm_pinf="fuchsia",
             cm_nan="yellow",
@@ -25,7 +25,7 @@ def chans(  t: np.ndarray,      # Input tensor
     `x` and `y` specify which dimensions should be used as spatial ones.
     """
     
-    assert t.ndim >= 2, f"Expected a 2 or 3-dim input, got {t.shape}={t.ndim}"
+    assert t.ndim >= 2, f"Expected a 2+ dim input, got {t.shape}={t.ndim}"
     if t.ndim == 2: t = t[None]
     
     if cl: # Convert to [..., C, H, W].

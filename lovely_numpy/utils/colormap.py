@@ -25,7 +25,7 @@ def get_cmap(cmap: str) -> Colormap:
         return mpl.colormaps[cmap]
 
 
-# %% ../../nbs/03a_utils.colormap.ipynb 17
+# %% ../../nbs/03a_utils.colormap.ipynb 21
 class InfCmap():
     """
     Matplotlib colormap extended to have colors for +/-inf
@@ -41,30 +41,34 @@ class InfCmap():
                  pinf:  Optional[str] =None, # +inf
                 ):
         _ = cmap(0) # one call to make sure the cmap is initialized
-        assert len(cmap._lut) == 259, "The colormap LUT should have 259 inputs"
         lut = cmap._lut.copy()
+        cmax = cmap.N-1
+        assert len(lut) == cmap.N+3, "Unexpected colormap LUT size"
         
-        if below: lut[256] = np.array(to_rgba(below))
-        if above: lut[257] = np.array(to_rgba(above))
-        if nan: lut[258] = np.array(to_rgba(nan))
-
+        
+        if below: lut[cmax+1] = np.array(to_rgba(below))
+        if above: lut[cmax+2] = np.array(to_rgba(above))
+        if nan: lut[cmax+3] = np.array(to_rgba(nan))
+        
         # For +/- inf, use above/below as defaults.
-        tensor_cmap_ninf = np.array(to_rgba(ninf)) if ninf else lut[256]
-        tensor_cmap_pinf = np.array(to_rgba(pinf)) if pinf else lut[257]
+        tensor_cmap_ninf = np.array(to_rgba(ninf)) if ninf else lut[cmax+1]
+        tensor_cmap_pinf = np.array(to_rgba(pinf)) if pinf else lut[cmax+2]
 
-        # Remove the alpha channel, it causes probems in pad_frame_gutters().
+        # Remove the alpha channel, it causes problems in pad_frame_gutters().
         self.lut = np.concatenate([ lut, tensor_cmap_ninf[None], tensor_cmap_pinf[None] ])[:,:3]
+        self.cmax = cmax
 
     def __call__(self, t: np.ndarray):
-        lut_idxs = (t*255).astype(np.uint8).astype(np.int64)
+        vals = ((t + 1) / 2)
+        cmax = self.cmax
+        lut_idxs = (vals * cmax).astype(np.int64)
         
-        lut_idxs[ t < 0. ] = 256
-        lut_idxs[ t > 1. ] = 257
-        lut_idxs[ np.isnan(t)] = 258
+        lut_idxs[ vals < 0. ] = cmax+1
+        lut_idxs[ vals > 1. ] = cmax+2
+        lut_idxs[ np.isnan(t)] = cmax+3
+        
 
-        lut_idxs[ np.isneginf(t) ] = 259
-        lut_idxs[ np.isposinf(t) ] = 260
+        lut_idxs[ np.isneginf(t) ] = cmax+4
+        lut_idxs[ np.isposinf(t) ] = cmax+5
         
-        return self.lut.take(lut_idxs, axis=0) # RGB added as color-last.
-        
-         
+        return self.lut.take(lut_idxs, axis=0, mode="clip") # RGB added as color-last.         
