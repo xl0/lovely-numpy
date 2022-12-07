@@ -20,6 +20,7 @@ def rgb(t: np.ndarray,             # Array to display. [[...], C,H,W] or [[...],
         view_width=966):           # target width of the image
     
     assert t.ndim >= 3, f"Expecting 3 or more dimension input, got shape=({t.shape})"
+    assert t.size > 0, f"Expecting non-empty input, got shape=({t.shape})"
     # swap channels if it's not channe-last already
     if not cl:
         t = np.swapaxes(np.swapaxes(t, -3, -1), -3, -2)

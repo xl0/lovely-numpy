@@ -27,7 +27,8 @@ dtnames =   {   "float16": "f16",
                 "int64": "i64",
             }
 
-def short_dtype(x: Union[np.ndarray, np.generic]): return dtnames.get(x.dtype.name, str(x.dtype)[6:])
+def short_dtype(x: Union[np.ndarray, np.generic]):
+    return dtnames.get(x.dtype.name, str(x.dtype)[6:])
 
 # %% ../nbs/00_repr_str.ipynb 8
 def plain_repr(x):
@@ -60,7 +61,7 @@ def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore
     common = np_to_str_common(x, color=color)
     dtype = short_dtype(x)
     
-    vals = pretty_str(x) if x.size <= 10 else None
+    vals = pretty_str(x) if 0 < x.size <= 10 else None
     res = sparse_join([type_str, dtype, common, vals])
 
     if verbose:

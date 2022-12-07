@@ -22,6 +22,8 @@ def fit_columns(t: np.ndarray, # Tensor with images, shape=(n,h,w,c)
     n_img = t.shape[0]
     width = t.shape[-2]
     
+    if not n_img or not width: return (0, 0)
+
     n_cols = 2**floor(log2((view_width / width)))
 
     # At least 1 image per row, even if it does not fit the view without rescaling.
@@ -41,13 +43,13 @@ def fit_columns(t: np.ndarray, # Tensor with images, shape=(n,h,w,c)
     return (n_rows, n_cols)
 
 # %% ../../nbs/03c_utils.tile2d.ipynb 16
-def tile2d(t: np.ndarray,      # Tensor containing images, shape=(n,h,w,c)
+def tile2d(t: np.ndarray,      # Array containing images, shape=(n,h,w,c)
             view_width=966):   # Try to protuce an images at most this wide
     """
     Tile images in a grid.
     """
     assert t.ndim == 4
-    assert t.shape[-1] in (3, 4) # Either RGB or RGBA.
+    # assert t.shape[-1] in (3, 4) # Either RGB or RGBA.
 
     
     n_images = t.shape[0]
@@ -79,7 +81,7 @@ def tile2d(t: np.ndarray,      # Tensor containing images, shape=(n,h,w,c)
     
     return t
 
-# %% ../../nbs/03c_utils.tile2d.ipynb 22
+# %% ../../nbs/03c_utils.tile2d.ipynb 21
 def hypertile(t: np.ndarray, #torch.Tensor, # input tensor, shape=([...], B, H, W, C)
             frame_px=1,        # Frame width for the innermost group
             gutter_px=3,       # Gutter width for the innermost group

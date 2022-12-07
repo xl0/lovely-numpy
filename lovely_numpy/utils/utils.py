@@ -73,7 +73,10 @@ def ansi_color(s: str, col: str, use_color=True):
 def np_to_str_common(x: Union[np.ndarray, np.generic],  # Input
                         color=True,                     # ANSI color highlighting
                         ddof=0):                        # For "std" unbiasing
-    
+
+    if x.size == 0:
+        return ansi_color("empty", "grey", color)
+
     zeros = ansi_color("all_zeros", "grey", color) if np.equal(x, 0.).all() and x.size > 1 else None
     pinf = ansi_color("+Inf!", "red", color) if np.isposinf(x).any() else None
     ninf = ansi_color("-Inf!", "red", color) if np.isneginf(x).any() else None
