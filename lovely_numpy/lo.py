@@ -21,7 +21,7 @@ class RGBProxy():
     
     def __init__(self, x:np.ndarray):
         # super().__init__()
-        assert x.ndim >= 3, f"Expecting at least 3 dimensions, got shape{t.shape}={t.dim()}"
+        assert x.ndim >= 3, f"Expecting at least 3 dimensions, got shape{x.shape}={x.ndim}"
         self.x = x
 
     def __call__(   self,
