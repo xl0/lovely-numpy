@@ -298,7 +298,7 @@ chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
 ![](index_files/figure-gfm/cell-29-output-1.png)
 
 ``` python
-plot(numbers)
+plot(numbers) # Note: Returns matplotlib.Figure
 ```
 
 ![](index_files/figure-gfm/cell-30-output-1.svg)
