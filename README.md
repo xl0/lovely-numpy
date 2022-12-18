@@ -201,6 +201,26 @@ lo(eight_images).rgb
 
 ![](index_files/figure-gfm/cell-16-output-1.png)
 
+## Histogram
+
+``` python
+lo(numbers+3).plt
+```
+
+![](index_files/figure-gfm/cell-17-output-1.png)
+
+``` python
+lo(numbers+3).plt(center="mean", max_s=1000)
+```
+
+![](index_files/figure-gfm/cell-18-output-1.png)
+
+``` python
+lo(numbers+3).plt(center="range")
+```
+
+![](index_files/figure-gfm/cell-19-output-1.png)
+
 ## Options
 
 See [docs](https://xl0.github.io/lovely-numpy/03d_utils.config.html) for
@@ -255,7 +275,7 @@ lo(np.array([1, 2, 3])).p # To see the plain values
 ## Without <code>Lo</code>
 
 ``` python
-from lovely_numpy import rgb, chans
+from lovely_numpy import rgb, chans, plot
 ```
 
 ``` python
@@ -269,10 +289,16 @@ lovely(numbers) # Returns `str`, that's why you see ''.
 rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like lo(x).rgb
 ```
 
-![](index_files/figure-gfm/cell-25-output-1.png)
+![](index_files/figure-gfm/cell-28-output-1.png)
 
 ``` python
 chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
 ```
 
-![](index_files/figure-gfm/cell-26-output-1.png)
+![](index_files/figure-gfm/cell-29-output-1.png)
+
+``` python
+plot(numbers)
+```
+
+![](index_files/figure-gfm/cell-30-output-1.svg)

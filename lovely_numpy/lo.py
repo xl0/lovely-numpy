@@ -9,10 +9,16 @@ from typing import Union
 import numpy as np
 from fastcore.all import store_attr
 
+from IPython.core.pylabtools import print_figure
+
+
 from .utils import history_warning
 from .repr_str import lovely
+from .repr_plt import plot
 from .repr_rgb import rgb
 from .repr_chans import chans
+
+
 
 
 # %% ../nbs/10_lo.ipynb 4
@@ -70,9 +76,49 @@ class ChanProxy():
         return self.__call__()._repr_png_()
 
 # %% ../nbs/10_lo.ipynb 6
+class PlotProxy(): 
+    """Flexible `PIL.Image.Image` wrapper"""
+    
+    def __init__(self, x:np.ndarray, center="zero", max_s=10000, plt0=True, fmt="png"):
+        self.x = x
+        self.center = center
+        self.fmt = fmt
+        self.max_s = max_s
+        self.plt0 = plt0
+        assert fmt in ["png", "svg"]
+        assert center in ["zero", "mean", "range"]
+
+    def __call__(self, center=None, max_s=None, plt0=None, fmt=None, ax=None):
+        center = center or self.center
+        fmt = fmt or self.fmt
+        if max_s is None: max_s = self.max_s
+        if plt0 is None: plt0 = self.plt0
+        if ax:
+            plot(self.x, center=center, max_s=max_s, plt0=plt0, ax=ax)
+            return ax
+
+        return PlotProxy(self.x, center=center, max_s=max_s, plt0=plt0, fmt=fmt)
+
+    # Do an explicit print_figure instead of relying on IPythons repr formatter
+    # for pyplot.Figure. Mainly for speed.
+    #
+    # IPython will attempt to render the figure in a bunch of formats, and then
+    # pick one to show. This takes a noticeable amount of time. Render just
+    # one format instead.
+    def _repr_svg_(self):
+        if self.fmt == "svg":
+            return print_figure(plot(self.x, center=self.center, max_s=self.max_s, plt0=self.plt0), fmt="svg")
+
+    def _repr_png_(self):
+        if self.fmt == "png":
+            return print_figure(plot(self.x, center=self.center, max_s=self.max_s, plt0=self.plt0), fmt="png")
+
+
+# %% ../nbs/10_lo.ipynb 7
 class Lo():
     """Lo and behold! What a lovely `numpy.ndarray`!"""
-    def __init__(self, x: Union[np.ndarray, np.generic],    # Your data
+    def __init__(   self,
+                    x: Union[np.ndarray, np.generic], # Your data
                     plain       =False, # Show as plain text - values only
                     verbose     =False, # Verbose - show values too
                     depth       =0,     # Expand up to `depth`
@@ -109,12 +155,16 @@ class Lo():
         "Show color channels"
         return ChanProxy(self.x)
 
+    @property
+    def plt(self):
+        return PlotProxy(self.x)
+
     # This is used for .deeper attribute and .deeper(depth=...).
     # The second one results in a __call__.
     def __call__(self, depth=1):
         return Lo(self.x, depth=depth, color=self.color)
 
-# %% ../nbs/10_lo.ipynb 7
+# %% ../nbs/10_lo.ipynb 8
 def lo(x: Union[np.ndarray, np.generic],    # Your data
         plain       =False, # Show as plain text - values only
         verbose     =False, # Verbose - show values too
