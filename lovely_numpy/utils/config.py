@@ -11,7 +11,7 @@ from contextlib import contextmanager
 
 import numpy as np
 
-# %% ../../nbs/03d_utils.config.ipynb 6
+# %% ../../nbs/03d_utils.config.ipynb 4
 class Config(SimpleNamespace):
     "Config"
     def __init__(self,
@@ -31,7 +31,7 @@ _defaults = Config()
 
 _config = copy(_defaults)
 
-# %% ../../nbs/03d_utils.config.ipynb 10
+# %% ../../nbs/03d_utils.config.ipynb 7
 # Allows passing None as an argument to reset the 
 class _Default():
     def __repr__(self):
@@ -39,7 +39,7 @@ class _Default():
 D = _Default()
 Default = TypeVar("Default")
 
-# %% ../../nbs/03d_utils.config.ipynb 11
+# %% ../../nbs/03d_utils.config.ipynb 8
 def set_config( precision       :Optional[Union[Default,int]]     =D,
                 threshold_min   :Optional[Union[Default,int]]     =D,
                 threshold_max   :Optional[Union[Default,int]]     =D,
@@ -74,12 +74,12 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
             else:
                 setattr(_config, k, v)
 
-# %% ../../nbs/03d_utils.config.ipynb 12
+# %% ../../nbs/03d_utils.config.ipynb 9
 def get_config():
     "Get a copy of config variables"
     return copy(_config)
 
-# %% ../../nbs/03d_utils.config.ipynb 13
+# %% ../../nbs/03d_utils.config.ipynb 10
 @contextmanager
 def config( precision       :Optional[Union[Default,int]]     =D,
             threshold_min   :Optional[Union[Default,int]]     =D,
@@ -91,7 +91,7 @@ def config( precision       :Optional[Union[Default,int]]     =D,
             str             :Optional[Union[Default,Callable]]=D,
             plt_seed        :Optional[Union[Default,int]]     =D,
             ):
-    "Context manager for temporarily setting printting options."
+    "Context manager for temporarily setting config options"
     new_opts = { k:v for k, v in locals().items() if v != D}
     old_opts = copy(get_config().__dict__)
 
