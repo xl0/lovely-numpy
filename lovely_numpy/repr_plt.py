@@ -42,15 +42,20 @@ def plot(   x: np.ndarray,  #
             center="zero",        # Center plot on  `zero`, `mean`, or `range`
             max_s=10000,          # Draw up to this many samples. =0 to draw all
             plt0=True,            # Take zero values into account
-            ax=None):             # Optionally, supply your own matplotlib axes.
+            ax=None,              # Optionally, supply your own matplotlib axes.
+            summary=None           # Summary string (to display on top). None=str(lovely(x))
+        ):
     """Plot statistics"""
 
     assert center in ["zero", "mean", "range"]
 
-    orig_str = str(lovely(x, color=False))
+
+    # Mainly useful when you call it from `lovely-tensors`/`-jax` and want to
+    # display backend-specific info.
+    if summary is None: summary = str(lovely(x, color=False))
     orig_numel = x.size
 
-    assert orig_numel > 0, f"Cannot plot an empty array: {orig_str}"
+    assert orig_numel > 0, f"Cannot plot an empty array: {str(lovely(x, color=False))}"
 
     # `t`` may have nasty things like 'nan' and 'inf'. Could also be of non-float type.
     x = x[ np.isfinite(x) ]
@@ -74,7 +79,7 @@ def plot(   x: np.ndarray,  #
         t_str += str(x.size) 
         if not plt0: t_str += " non-zero"
         t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
-    t_str += orig_str
+    t_str += summary
 
     fig = None
     if not ax:
