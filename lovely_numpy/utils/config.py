@@ -21,6 +21,7 @@ _defaults = SimpleNamespace(
     color         = True, # ANSI colors in text
     repr          = None, # `lovely` is used for `repr(np.ndarray)`
     str           = None, # `lovely` is used for `str(np.ndarray)`
+    plt_seed      = 42    # .plt sampling seed. None=random.  
 )
 
 _config = copy(_defaults)
@@ -30,23 +31,25 @@ _config = copy(_defaults)
 class _Default():
     def __repr__(self):
         return "Ignore"
-Default = _Default()
-D = TypeVar("Default")
+D = _Default()
+Default = TypeVar("Default")
 
 # %% ../../nbs/03d_utils.config.ipynb 7
-def set_config( precision       :Optional[Union[D, int]]    =Default, # Digits after `.`
-                threshold_min   :Optional[Union[D,int]]     =Default, # .abs() larger than 1e3 -> Sci mode
-                threshold_max   :Optional[Union[D,int]]     =Default, # .abs() smaller that 1e-4 -> Sci mode
-                sci_mode        :Optional[Union[D,bool]]    =Default, # Sci mode (1.2e3), True, False, None=auto.
-                indent          :Optional[Union[D,bool]]    =Default, # Indent for .deeper()
-                color           :Optional[Union[D,bool]]    =Default, # ANSI colors in text
-                repr            :Optional[Union[D,Callable]]=Default, # 
-                str             :Optional[Union[D,Callable]]=Default):# 
+def set_config( precision       :Optional[Union[Default,int]]     =D, # Digits after `.`
+                threshold_min   :Optional[Union[Default,int]]     =D, # .abs() larger than 1e3 -> Sci mode
+                threshold_max   :Optional[Union[Default,int]]     =D, # .abs() smaller that 1e-4 -> Sci mode
+                sci_mode        :Optional[Union[Default,bool]]    =D, # Sci mode (1.2e3), True, False, None=auto.
+                indent          :Optional[Union[Default,bool]]    =D, # Indent for .deeper()
+                color           :Optional[Union[Default,bool]]    =D, # ANSI colors in text
+                repr            :Optional[Union[Default,Callable]]=D, # 
+                str             :Optional[Union[Default,Callable]]=D, #
+                plt_seed        :Optional[Union[Default,int]]     =D, # .plt() sampling seed. None=random.
+                ) -> None:
 
     "Set config variables"
     args = locals().copy()
     for k,v in args.items():
-        if v != Default:
+        if v != D:
             
             # set_config(repr=func)             -> Set both `repr` and `str`.
             # set_config(repr=func, str=None)   -> Set `repr`, unset `str``
@@ -56,7 +59,7 @@ def set_config( precision       :Optional[Union[D, int]]    =Default, # Digits a
 
             if k == "repr":
                 np.set_string_function(v, True)
-                if args["str"] == Default:
+                if args["str"] == D:
                     np.set_string_function(v, False)
             if k == "str":
                 np.set_string_function(v, False)
@@ -74,17 +77,19 @@ def get_config():
 
 # %% ../../nbs/03d_utils.config.ipynb 9
 @contextmanager
-def config( precision       :Optional[Union[D,int]]    =Default, # Digits after `.`
-            threshold_min   :Optional[Union[D,int]]     =Default, # .abs() larger than 1e3 -> Sci mode
-            threshold_max   :Optional[Union[D,int]]     =Default, # .abs() smaller that 1e-4 -> Sci mode
-            sci_mode        :Optional[Union[D,bool]]    =Default, # Sci mode (1.2e3), True, False, None=auto.
-            indent          :Optional[Union[D,bool]]    =Default, # Indent for .deeper()
-            color           :Optional[Union[D,bool]]    =Default, # ANSI colors in text
-            repr            :Optional[Union[D,Callable]]=Default, # 
-            str             :Optional[Union[D,Callable]]=Default):#
+def config( precision       :Optional[Union[Default,int]]     =D, # Digits after `.`
+            threshold_min   :Optional[Union[Default,int]]     =D, # .abs() larger than 1e3 -> Sci mode
+            threshold_max   :Optional[Union[Default,int]]     =D, # .abs() smaller that 1e-4 -> Sci mode
+            sci_mode        :Optional[Union[Default,bool]]    =D, # Sci mode (1.2e3), True, False, None=auto.
+            indent          :Optional[Union[Default,bool]]    =D, # Indent for .deeper()
+            color           :Optional[Union[Default,bool]]    =D, # ANSI colors in text
+            repr            :Optional[Union[Default,Callable]]=D, # 
+            str             :Optional[Union[Default,Callable]]=D, # 
+            plt_seed        :Optional[Union[Default,int]]     =D, # .plt() sampling seed. None=random.
+            ):
     "Context manager for temporarily setting printting options."
     global _config
-    new_opts = { k:v for k, v in locals().items() if v != Default }
+    new_opts = { k:v for k, v in locals().items() if v != D }
     old_opts = copy(get_config().__dict__)
 
     try:

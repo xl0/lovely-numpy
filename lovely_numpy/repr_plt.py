@@ -9,11 +9,9 @@ from typing import Union
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib
-# from IPython.core.pylabtools import print_figure
-# import torch
-# import hashlib
 
 from .repr_str import lovely, pretty_str
+from .utils import get_config
 
 # %% ../nbs/02_repr_plt.ipynb 5
 def normal_pdf( x: np.ndarray,
@@ -67,7 +65,8 @@ def plot(   x: np.ndarray,  #
     if not plt0: x = x[x != 0.]
     
     if x.size > max_s and max_s > 0:
-        x = np.random.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
+        rng = np.random.default_rng( get_config().plt_seed )
+        x = rng.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
 
     ### Plot an empty histogram instead of throwing an assert!
     assert x.size > 0, f"Cannot plot array because all values are invalid: {str(lovely(x, color=False))}"
