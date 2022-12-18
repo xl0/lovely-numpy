@@ -11,22 +11,27 @@ from contextlib import contextmanager
 
 import numpy as np
 
-# %% ../../nbs/03d_utils.config.ipynb 5
-_defaults = SimpleNamespace(
-    precision     = 3,    # Digits after `.`
-    threshold_max = 3,    # .abs() larger than 1e3 -> Sci mode
-    threshold_min = -4,   # .abs() smaller that 1e-4 -> Sci mode
-    sci_mode      = None, # Sci mode (2.3e4). 
-    indent        = 2,    # Indent for .deeper()
-    color         = True, # ANSI colors in text
-    repr          = None, # `lovely` is used for `repr(np.ndarray)`
-    str           = None, # `lovely` is used for `str(np.ndarray)`
-    plt_seed      = 42    # .plt sampling seed. None=random.  
-)
+# %% ../../nbs/03d_utils.config.ipynb 6
+class Config(SimpleNamespace):
+    "Config"
+    def __init__(self,
+            precision     = 3,    # Digits after `.`
+            threshold_max = 3,    # .abs() larger than 1e3 -> Sci mode
+            threshold_min = -4,   # .abs() smaller that 1e-4 -> Sci mode
+            sci_mode      = None, # Sci mode (2.3e4). None=auto
+            indent        = 2,    # Indent for .deeper()
+            color         = True, # ANSI colors in text
+            repr          = None, # Use func e.g. `lovely` for `repr(np.ndarray)`
+            str           = None, # Use func e.g. `lovely` for `str(np.ndarray)`
+            plt_seed      = 42    # Sampling seed for `plot`. None=random.  
+    ):
+        super().__init__(**{k:v for k,v in locals().items() if k not in ["self", "__class__"]})
+
+_defaults = Config()
 
 _config = copy(_defaults)
 
-# %% ../../nbs/03d_utils.config.ipynb 6
+# %% ../../nbs/03d_utils.config.ipynb 10
 # Allows passing None as an argument to reset the 
 class _Default():
     def __repr__(self):
@@ -34,16 +39,16 @@ class _Default():
 D = _Default()
 Default = TypeVar("Default")
 
-# %% ../../nbs/03d_utils.config.ipynb 7
-def set_config( precision       :Optional[Union[Default,int]]     =D, # Digits after `.`
-                threshold_min   :Optional[Union[Default,int]]     =D, # .abs() larger than 1e3 -> Sci mode
-                threshold_max   :Optional[Union[Default,int]]     =D, # .abs() smaller that 1e-4 -> Sci mode
-                sci_mode        :Optional[Union[Default,bool]]    =D, # Sci mode (1.2e3), True, False, None=auto.
-                indent          :Optional[Union[Default,bool]]    =D, # Indent for .deeper()
-                color           :Optional[Union[Default,bool]]    =D, # ANSI colors in text
-                repr            :Optional[Union[Default,Callable]]=D, # 
-                str             :Optional[Union[Default,Callable]]=D, #
-                plt_seed        :Optional[Union[Default,int]]     =D, # .plt() sampling seed. None=random.
+# %% ../../nbs/03d_utils.config.ipynb 11
+def set_config( precision       :Optional[Union[Default,int]]     =D,
+                threshold_min   :Optional[Union[Default,int]]     =D,
+                threshold_max   :Optional[Union[Default,int]]     =D,
+                sci_mode        :Optional[Union[Default,bool]]    =D,
+                indent          :Optional[Union[Default,bool]]    =D,
+                color           :Optional[Union[Default,bool]]    =D,
+                repr            :Optional[Union[Default,Callable]]=D,
+                str             :Optional[Union[Default,Callable]]=D,
+                plt_seed        :Optional[Union[Default,int]]     =D,
                 ) -> None:
 
     "Set config variables"
@@ -69,28 +74,27 @@ def set_config( precision       :Optional[Union[Default,int]]     =D, # Digits a
             else:
                 setattr(_config, k, v)
 
-
-# %% ../../nbs/03d_utils.config.ipynb 8
+# %% ../../nbs/03d_utils.config.ipynb 12
 def get_config():
     "Get a copy of config variables"
     return copy(_config)
 
-# %% ../../nbs/03d_utils.config.ipynb 9
+# %% ../../nbs/03d_utils.config.ipynb 13
 @contextmanager
-def config( precision       :Optional[Union[Default,int]]     =D, # Digits after `.`
-            threshold_min   :Optional[Union[Default,int]]     =D, # .abs() larger than 1e3 -> Sci mode
-            threshold_max   :Optional[Union[Default,int]]     =D, # .abs() smaller that 1e-4 -> Sci mode
-            sci_mode        :Optional[Union[Default,bool]]    =D, # Sci mode (1.2e3), True, False, None=auto.
-            indent          :Optional[Union[Default,bool]]    =D, # Indent for .deeper()
-            color           :Optional[Union[Default,bool]]    =D, # ANSI colors in text
-            repr            :Optional[Union[Default,Callable]]=D, # 
-            str             :Optional[Union[Default,Callable]]=D, # 
-            plt_seed        :Optional[Union[Default,int]]     =D, # .plt() sampling seed. None=random.
+def config( precision       :Optional[Union[Default,int]]     =D,
+            threshold_min   :Optional[Union[Default,int]]     =D,
+            threshold_max   :Optional[Union[Default,int]]     =D,
+            sci_mode        :Optional[Union[Default,bool]]    =D,
+            indent          :Optional[Union[Default,bool]]    =D,
+            color           :Optional[Union[Default,bool]]    =D,
+            repr            :Optional[Union[Default,Callable]]=D,
+            str             :Optional[Union[Default,Callable]]=D,
+            plt_seed        :Optional[Union[Default,int]]     =D,
             ):
     "Context manager for temporarily setting printting options."
-    global _config
-    new_opts = { k:v for k, v in locals().items() if v != D }
+    new_opts = { k:v for k, v in locals().items() if v != D}
     old_opts = copy(get_config().__dict__)
+
 
     try:
         set_config(**new_opts)
