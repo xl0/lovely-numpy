@@ -5,10 +5,12 @@ __all__ = ['plot']
 
 # %% ../nbs/02_repr_plt.ipynb 3
 import math
-from typing import Union
+from typing import Union, Tuple
 import numpy as np
 from matplotlib import pyplot as plt
+import matplotlib.axes
 import matplotlib
+
 
 from .repr_str import lovely, pretty_str
 from .utils import get_config
@@ -36,43 +38,176 @@ def normal_pdf( x: np.ndarray,
             )
 
 # %% ../nbs/02_repr_plt.ipynb 7
+def sample( x: np.ndarray,
+            max_s: int,
+            plt0: bool):
+
+    # Samples up to max_s elements and returns
+    #   - samples from x
+    #   - original x min (None = no good numbes in x)
+    #   - original x max (None = no good numbes in x)
+    
+    # Ignore NaN and Inf.
+    x = x[ np.isfinite(x) ]
+
+    x_min = x_max = None
+
+    if x.size: 
+        x_min, x_max = x.min(), x.max()
+        
+        # An option to ignore zeros
+        if not plt0: x = x[x != 0.]
+
+        if x.size > max_s and max_s > 0:
+            rng = np.random.default_rng( get_config().plt_seed )
+            x = rng.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
+
+    return (x, x_min, x_max)  
+
+# %% ../nbs/02_repr_plt.ipynb 8
+def find_xlims( x_min:  Union[float, None],
+                x_max:  Union[float, None],
+                x_mean: Union[float, None],
+                x_std:  Union[float, None],
+                center: str):
+
+    assert center in ["zero", "mean", "range"]
+    
+    if x_min is None or x_max is None: return (-1., 1,)
+    if x_min == x_max and center == "range": center = "zero"
+    if x_mean is None or x_std is None and center == "mean": center = "zero"
+
+    # Center the plot around zero, mean, or the extents of the range of t.
+    if center == "range":
+        # Center plot arounf the full range of x
+        xlim_min, xlim_max = x_min, x_max
+    elif center == "mean":
+        assert x_mean is not None
+        # Center the plot around mean
+        # Max distance between mean value and x_min / x_max
+        max_div = max(abs(x_mean - x_min), abs(x_max - x_mean))
+
+        xlim_min = x_mean - max_div
+        xlim_max = x_mean + max_div
+    else: # center == "zero"
+        # Center the plot around zero
+        abs_max_value = max(abs(x_min), abs(x_max))
+        xlim_min, xlim_max = -abs_max_value, abs_max_value
+    
+
+    # Give some extra space around the 
+    xlim_min -= abs(xlim_max - xlim_min) * 0.02
+    xlim_max += abs(xlim_max - xlim_min) * 0.02
+
+    return (xlim_min, xlim_max)
+
+# %% ../nbs/02_repr_plt.ipynb 9
+def plot_histogram( x: np.ndarray,
+                    ax: matplotlib.axes.Axes):
+    if x.size:
+        # Around 50 items / bin seems to look good.
+        # But don't go below 10 or above 100.
+        bins = int(x.size / 50)
+
+        # Adjust the number of bins proportional to the fraction of x axis occupied
+        # by the histogram
+        xlims = ax.get_xlim()
+        
+        bins = max(min(bins, 100), 10)
+        bins = np.ceil( bins * ( (x.max()-x.min())/(xlims[1]-xlims[0]) ) ).astype(int)
+        
+        ax.hist(x, bins=bins, color="deepskyblue", align="mid", density=True, zorder=4)
+
+# %% ../nbs/02_repr_plt.ipynb 10
+def plot_pdf(   x_mean: Union[float, None],
+                x_std: Union[float, None],
+                ax: matplotlib.axes.Axes):
+    # PDF of normal distribution with the same mean and std.
+
+    if x_std: # Not None and not 0.
+        assert x_mean is not None
+        xlims = ax.get_xlim()
+        xl = np.linspace(*xlims, 100)
+        # normal_density = normal_pdf(xl, mean=x_mean, std=x_std)
+        ax.plot(xl, normal_pdf(xl, mean=x_mean, std=x_std), zorder=5)
+
+
+# %% ../nbs/02_repr_plt.ipynb 11
+def plot_sigmas(x_min, x_max, x_mean, x_std, ax):
+    if x_min is not None and x_max is not None:
+        xlims = ax.get_xlim()
+        ylims = ax.get_ylim()
+        # Make text bank part of the line under it
+        bbox = dict(boxstyle="round", fc="white", edgecolor="none")
+        sigmas = max(int(math.floor((abs(x_mean - x_min) / x_std))),
+                    int(math.floor((abs(x_max - x_mean) / x_std))))
+
+        for s in range(-sigmas, sigmas+1):
+            x_pos = (x_mean + s*x_std)
+            if xlims[0] < x_pos < xlims[1]:
+                greek = ["-σ", "μ", "+σ"][s+1]  if -1 <= s <= 1 else f"{s:+}σ"
+                weight='bold' if not s else None
+                ax.axvline(x_pos, 0, 1, c="black")
+                ax.text(x_pos, ylims[1]*0.95, greek, ha="center", va="top", bbox=bbox, zorder=5, weight=weight)
+
+
+# %% ../nbs/02_repr_plt.ipynb 12
+def plot_minmax(x_min, x_max, ax):
+    if x_min is not None and x_max is not None:
+        bbox = dict(boxstyle="round", fc="white", edgecolor="none", pad=0.)
+        y_max = ax.get_ylim()[1]
+
+        # 2 red lines for min and max values
+        ax.annotate(
+            f"min={pretty_str(x_min)}",
+            (x_min, y_max/2),
+            xytext=(-1, 0), textcoords='offset points',
+            bbox=bbox,
+            rotation=90,
+            ha="right",
+            va="center"
+            )
+
+        ax.annotate(
+            f"max={pretty_str(x_max)}",
+            (x_max, y_max/2),
+            xytext=(2, 0), textcoords='offset points',
+            bbox=bbox,
+            rotation=90,
+            ha="left",
+            va="center"
+            )
+
+        ax.axvline(x_min, 0, 1, c="red", zorder=2)
+        ax.axvline(x_max, 0, 1, c="red", zorder=2)
+
+
+# %% ../nbs/02_repr_plt.ipynb 13
+def plot_str(t_str, ax):
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    ax.text(xlim[0], ylim[1]*1.05, s=t_str)
+
+# %% ../nbs/02_repr_plt.ipynb 14
 def plot(   x: np.ndarray,  # 
             center="zero",        # Center plot on  `zero`, `mean`, or `range`
             max_s=10000,          # Draw up to this many samples. =0 to draw all
             plt0=True,            # Take zero values into account
             ax=None,              # Optionally, supply your own matplotlib axes.
-            summary=None           # Summary string (to display on top). None=str(lovely(x))
+            summary=None,         # Summary string (to display on top). None=str(lovely(x))
+            ddof=0,               # Apply bias correction to std
         ):
     """Plot statistics"""
 
-    assert center in ["zero", "mean", "range"]
-
-
-    # Mainly useful when you call it from `lovely-tensors`/`-jax` and want to
+    # Useful when you call `plot` from `lovely-tensors`/`-jax` and want to
     # display backend-specific info.
     if summary is None: summary = str(lovely(x, color=False))
     orig_numel = x.size
-
-    assert orig_numel > 0, f"Cannot plot an empty array: {str(lovely(x, color=False))}"
-
-    # `t`` may have nasty things like 'nan' and 'inf'. Could also be of non-float type.
-    x = x[ np.isfinite(x) ]
-
-    x_min, x_max = x.min(), x.max()
-
-    # Sometimes we don't want to count zeros in the histogram.
-    # Think NN activations after ReLU where half the values are 0.
-    if not plt0: x = x[x != 0.]
-    
-    if x.size > max_s and max_s > 0:
-        rng = np.random.default_rng( get_config().plt_seed )
-        x = rng.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
-
-    ### Plot an empty histogram instead of throwing an assert!
-    assert x.size > 0, f"Cannot plot array because all values are invalid: {str(lovely(x, color=False))}"
-    
-    x_mean, x_std = x.mean(), x.std()
    
+    x, x_min, x_max = sample(x, max_s, plt0)
+    x_mean, x_std = (x.mean(), x.std(ddof=ddof)) if x.size else (None,None)
+
+
     t_str = ""
     if x.size != orig_numel:
         t_str += str(x.size) 
@@ -86,94 +221,20 @@ def plot(   x: np.ndarray,  #
         fig.tight_layout()
         plt.close(fig)
 
-    # Center the plot around zero, mean, or the extents of the range of t.
-    if center == "range":
-        # X limits should center the plot around the mean value
-        # x_limit = max(t_min.abs().item(), t_max.abs().item())
-        xlim_min, xlim_max = x_min, x_max
-    elif center == "mean":
-        max_div = max(abs(x_mean - x_min), abs(x_max - x_mean))
-        xlim_min, xlim_max = x_mean - max_div, x_mean + max_div
-        # x_limits = [t_mean - x_limit, t_mean + x_limit]
-    else:
-        # X limits should center the plot around zero
-        abs_max_value = max(abs(x_min), abs(x_max))
-        # ,
-                    # (t_mean-max_sigma*t_std).item(), (t_mean+max_sigma*t_std).item())
-        xlim_min, xlim_max = -abs_max_value, abs_max_value
+    xlims = find_xlims(x_min, x_max, x_mean, x_std, center)
+    ax.set_xlim(*xlims)
+    plot_histogram(x,  ax)
+    plot_pdf(x_mean, x_std, ax)
+    
+    # Add extra space to make sure the labels clear the histogram
+    ylim = ax.get_ylim()
+    ax.set_ylim( ylim[0], ylim[1]*1.3 )
 
-
-    assert x_std != 0, "Std is 0! This is not good. XXX: Handle this"
-    assert x_std == x_std, "Std is Nan! This is not good. XXX: Handle this"
-        
-    sigmas = max(int(math.floor((abs(x_mean - x_min) / x_std))),
-                int(math.floor((abs(x_max - x_mean) / x_std))))
-
-    xlim_min -= abs(xlim_max - xlim_min) * 0.02
-    xlim_max += abs(xlim_max - xlim_min) * 0.02
-
-    # Around 50 items / bin seems ot look good. But don't go below 10 or above 100.
-    bins = int(x.size / 50)
-    bins = max(min(bins, 100), 10)
-
-    hvals, hedges = np.histogram(x, range=(xlim_min, xlim_max), bins=bins)
-
-    # histc = x.histc(bins=bins, min=t_min, max=t_max)
-
-    # bar_edges = torch.linspace(t_min, t_max, bins+1)[:bins]
-    bar_width = np.diff(hedges[:2]) # bar_edges[:2].diff()
-
-    # Histogram normalized to look like PDF: area under histogram = 1.
-    histc_density = (hvals / (hvals.sum() * bar_width))
-    ax.bar(x=hedges[:-1], height=histc_density, width=bar_width, color="deepskyblue", align="edge", zorder=4,)
-
-
-    # PDF of normal distribution with the same mean and std.
-    xl = np.linspace(xlim_min, xlim_max, 100)
-    normal_density = normal_pdf(xl, mean=x_mean, std=x_std)
-    ax.plot(xl, normal_pdf(xl, mean=x_mean, std=x_std), zorder=5)
-
-    y_lim = max(histc_density.max(), normal_density.max()) * 1.3
-
-    # Make text bank part of the line under it
-    bbox = dict(boxstyle="round", fc="white", edgecolor="none")
-
-    for s in range(-sigmas, sigmas+1):
-        x_pos = (x_mean + s*x_std)
-        if xlim_min < x_pos < xlim_max:
-            greek = ["-σ", "μ", "+σ"][s+1]  if -1 <= s <= 1 else f"{s:+}σ"
-            weight='bold' if not s else None
-            ax.axvline(x_pos, 0, 1, c="black")
-            ax.text(x_pos, y_lim*0.95, greek, ha="center", va="top", bbox=bbox, zorder=5, weight=weight)
-
-    # 2 red lines for min and max values
-    ax.annotate(
-        f"min={pretty_str(x_min)}",
-        (x_min, y_lim/2),
-        xytext=(-1, 0), textcoords='offset points',
-        bbox=bbox,
-        rotation=90,
-        ha="right",
-        va="center"
-        )
-
-    ax.annotate(
-        f"max={pretty_str(x_max)}",
-        (x_max, y_lim/2),
-        xytext=(2, 0), textcoords='offset points',
-        bbox=bbox,
-        rotation=90,
-        ha="left",
-        va="center"
-        )
-
-    ax.axvline(x_min, 0, 1, c="red", zorder=4)
-    ax.axvline(x_max, 0, 1, c="red", zorder=4)
-
-    ax.text(xlim_min, y_lim*1.05, s=t_str)
-    ax.set_ylim(0, y_lim)
+    plot_sigmas(x_min, x_max, x_mean, x_std, ax)
+    plot_minmax(x_min, x_max, ax)
+    plot_str(t_str, ax)
+    
     ax.set_yticks([])
 
-    ax.set_xlim(xlim_min, xlim_max )
-
     return fig
+
