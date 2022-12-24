@@ -302,3 +302,33 @@ plot(numbers)
 ```
 
 ![](index_files/figure-gfm/cell-30-output-1.svg)
+
+## Matplotlib integration
+
+``` python
+lo(numbers).rgb(in_stats).fig # matplotlib figure
+```
+
+![](index_files/figure-gfm/cell-31-output-1.svg)
+
+``` python
+lo(numbers*0.3+0.5).chans.fig # matplotlib figure
+```
+
+![](index_files/figure-gfm/cell-32-output-1.svg)
+
+``` python
+lo(numbers).plt.fig.savefig('pretty.svg') # Save it
+```
+
+``` python
+fig, (ax1, ax2) = plt.subplots(2, figsize=(10,4))
+ax1.set_axis_off()
+plt.close(fig)
+fig.tight_layout()
+
+lo(numbers_01).chans(ax=ax1)
+lo(numbers_01).plt(ax=ax2)
+```
+
+![](index_files/figure-gfm/cell-34-output-1.svg)
