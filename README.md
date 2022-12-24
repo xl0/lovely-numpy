@@ -221,10 +221,7 @@ lo(numbers+3).plt(center="range")
 
 ![](index_files/figure-gfm/cell-19-output-1.svg)
 
-## Options
-
-See [docs](https://xl0.github.io/lovely-numpy/03d_utils.config.html) for
-more
+## Options \| [Docs](03d_utils.config.html)
 
 ``` python
 from lovely_numpy import set_config, config, lovely
@@ -303,9 +300,7 @@ plot(numbers)
 
 ![](index_files/figure-gfm/cell-30-output-1.svg)
 
-## Matplotlib integration
-
-See [docs](https://xl0.github.io/lovely-numpy/matplotlib.html) for more
+## Matplotlib integration \| [Docs](matplotlib.html)
 
 ``` python
 lo(numbers).rgb(in_stats).fig # matplotlib figure
@@ -318,7 +313,7 @@ lo(numbers).plt.fig.savefig('pretty.svg') # Save it
 ```
 
 ``` python
-!file pretty.svg
+!file pretty.svg; rm pretty.svg
 ```
 
     pretty.svg: SVG Scalable Vector Graphics image
