@@ -305,6 +305,8 @@ plot(numbers)
 
 ## Matplotlib integration
 
+See [docs](https://xl0.github.io/lovely-numpy/matplotlib.html) for more
+
 ``` python
 lo(numbers).rgb(in_stats).fig # matplotlib figure
 ```

@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt, axes, figure, rc_context
 from IPython.core.pylabtools import print_figure
 
 from .repr_str import lovely, pretty_str
-from .utils import get_config
+from .utils import get_config, config
 
 # %% ../nbs/02_repr_plt.ipynb 4
 def normal_pdf( x   :np.ndarray,
@@ -276,7 +276,13 @@ class PlotProxy():
 
     @cached_property
     def fig(self) -> figure.Figure:
-        return fig_plot( self.x, summary=lovely(self.x, color=False), **self.params)
+        if get_config().fig_show:
+            with config(fig_close=False):
+                fig = fig_plot( self.x, **self.params)
+            plt.show()
+        else:
+            fig = fig_plot( self.x, **self.params)
+        return fig
 
     def _repr_png_(self):
         return print_figure(self.fig, fmt="png",

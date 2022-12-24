@@ -13,7 +13,7 @@ from IPython.core.pylabtools import print_figure
 
 
 from .utils.tile2d import hypertile
-from .utils import get_config
+from .utils import get_config, config
 
 # %% ../nbs/01_repr_rgb.ipynb 4
 def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
@@ -99,7 +99,13 @@ class RGBProxy():
 
     @cached_property
     def fig(self) -> figure.Figure:
-        return fig_rgb(self.x, **self.params)
+        if get_config().fig_show:
+            with config(fig_close=False):
+                fig = fig_rgb(self.x, **self.params)
+            plt.show()
+        else: 
+            fig = fig_rgb(self.x, **self.params)
+        return fig
 
     def _repr_png_(self):
         return print_figure(self.fig, fmt="png", pad_inches=0,

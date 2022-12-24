@@ -16,4 +16,5 @@ website:
       - section: ✨ Misc
         contents:
           - 10_lo.ipynb
+          - matplotlib.ipynb
           - 03d_utils.config.ipynb

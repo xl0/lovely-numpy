@@ -8,12 +8,12 @@ from typing import Any, Optional as O
 from functools import cached_property
 
 import numpy as np
-from matplotlib import axes, figure
+from matplotlib import axes, figure, pyplot as plt
 from IPython.core.pylabtools import print_figure
 
 from .repr_rgb import fig_rgb, rgb
 from .utils.colormap import InfCmap, get_cmap
-
+from .utils.config import config, get_config
 
 # %% ../nbs/05_repr_chans.ipynb 4
 def fig_chans( x           :np.ndarray,      # Input array
@@ -87,7 +87,13 @@ class ChanProxy():
 
     @cached_property
     def fig(self) -> figure.Figure:
-        return fig_chans(self.x, **self.params, )
+        if get_config().fig_show:
+            with config(fig_close=False):
+                fig = fig_chans(self.x, **self.params)
+            plt.show()
+        else:
+            fig = fig_chans(self.x, **self.params)
+        return fig
 
     def _repr_png_(self):
         return print_figure(self.fig, fmt="png", pad_inches=0,
