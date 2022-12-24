@@ -4,41 +4,119 @@
 __all__ = ['rgb']
 
 # %% ../nbs/01_repr_rgb.ipynb 3
-from typing import Union 
+from typing import Union, Any, Optional as O
+from functools import cached_property
+
 import numpy as np
-from PIL import Image
+from matplotlib import pyplot as plt, axes, figure, rcParams
+from IPython.core.pylabtools import print_figure
+
 
 from .utils.tile2d import hypertile
 
 # %% ../nbs/01_repr_rgb.ipynb 4
-def rgb(t: np.ndarray,             # Array to display. [[...], C,H,W] or [[...], H,W,C]
-        denorm=None,               # Reverse per-channel normalizatoin
-        cl: Union[int, bool]=True, # Channel-last
-        gutter_px = 3,             # If more than one tensor -> tile with this gutter width
-        frame_px=1,                # If more than one tensor -> tile with this frame width
-        scale=1,                   # Stretch the image. Only itegers please.
-        view_width=966):           # target width of the image
+def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
+            denorm      :Any    =None,      # Reverse per-channel normalizatoin
+            cl          :Any    =True,      # Channel-last
+            gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
+            frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
+            scale       :int    =1,         # Stretch the image. Only itegers please.
+            view_width  :int    =966,       # target width of the image 
+            clip        :bool   =True,      # Selently clip RGB values to [0, 1]
+            ax          :O[axes.Axes]=None  # Matplotlib axes
+        ) -> figure.Figure:
     
-    assert t.ndim >= 3, f"Expecting 3 or more dimension input, got shape=({t.shape})"
-    assert t.size > 0, f"Expecting non-empty input, got shape=({t.shape})"
+    assert x.ndim >= 3, f"Expecting 3 or more dimension input, got shape=({x.shape})"
+    assert x.size > 0, f"Expecting non-empty input, got shape=({x.shape})"
     # swap channels if it's not channe-last already
     if not cl:
-        t = np.swapaxes(np.swapaxes(t, -3, -1), -3, -2)
+        x = np.swapaxes(np.swapaxes(x, -3, -1), -3, -2)
 
     scale = int(scale)
-    t = t.repeat(scale, axis=-2).repeat(scale, axis=-3)
+    x = x.repeat(scale, axis=-2).repeat(scale, axis=-3)
 
-    n_ch = t.shape[-1]
-    assert n_ch in (3, 4), f"Expecting 3 (RGB) or 4 (RGBA) color channels, got {n_ch}, shape=({t.shape})"
+    n_ch = x.shape[-1]
+    assert n_ch in (3, 4), f"Expecting 3 (RGB) or 4 (RGBA) color channels, got {n_ch}, shape=({x.shape})"
     if denorm:
         means = np.array(denorm[0])
         stds = np.array(denorm[1])
-        t = t * stds + means
+        x = x * stds + means
 
-    if t.ndim > 3:
-        t = hypertile(  t=t,
+    if x.ndim > 3:
+        x = hypertile(  t=x,
                         gutter_px=gutter_px,
                         frame_px=frame_px,
                         view_width=view_width)
 
-    return Image.fromarray((t * 255).astype(np.uint8))
+    if clip: np.clip(x, 0, 1, out=x)
+
+    fig = None
+    if not ax:
+        fig = plt.figure(frameon=False, figsize=(x.shape[1] * 0.01, x.shape[0]*0.01) )
+        plt.close(fig)
+        fig.set_dpi(100)
+
+        ax = fig.add_axes([0,0,1,1])
+        ax.set_axis_off()
+        ax.set_xlim(0, x.shape[1]+1)
+
+    ax.imshow(x, interpolation="none")
+
+    return ax.figure
+
+# %% ../nbs/01_repr_rgb.ipynb 5
+class RGBProxy():
+    """Flexible `PIL.Image.Image` wrapper"""
+    
+    def __init__(self, x:np.ndarray):
+        assert x.ndim >= 3, f"Expecting at least 3 dimensions, got shape{x.shape}={x.size}"
+        self.x=x
+        self.params = dict( denorm      = None,
+                            cl          = True,
+                            gutter_px   = 3,     
+                            frame_px    = 1,
+                            scale       = 1,
+                            view_width  = 966,
+                            clip        = True,
+                            ax          = None)
+
+    def __call__(self,
+                denorm      :Any    =None,
+                cl          :Any    =None,
+                gutter_px   :O[int] =None,
+                frame_px    :O[int] =None,
+                scale       :O[int] =None,
+                view_width  :O[int] =None,
+                clip        :Any    =None,
+                ax          :O[axes.Axes]=None):
+        
+        self.params.update( { k:v for
+                            k,v in locals().items()
+                            if k != "self" and v is not None } )
+        _ = self.fig # Trigger figure generation
+        return self
+
+    @cached_property
+    def fig(self) -> figure.Figure:
+        return fig_rgb(self.x, **self.params)
+
+    def _repr_png_(self):
+        return print_figure(self.fig, fmt="png", pad_inches=0,
+            metadata={"Software": "Matplotlib, https://matplotlib.org/"})
+
+# %% ../nbs/01_repr_rgb.ipynb 6
+def rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
+        denorm      :Any    =None,      # Reverse per-channel normalizatoin
+        cl          :Any    =True,      # Channel-last
+        gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
+        frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
+        scale       :int    =1,         # Stretch the image. Only itegers please.
+        view_width  :int    =966,       # target width of the image 
+        clip        :bool   =True,      # Selently clip RGB values to [0, 1]
+        ax          :O[axes.Axes]=None  # Matplotlib axes
+        ) -> RGBProxy:
+
+    args = locals()
+    del args["x"]
+    
+    return RGBProxy(x)(**args)

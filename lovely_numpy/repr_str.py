@@ -4,7 +4,7 @@
 __all__ = ['lovely']
 
 # %% ../nbs/00_repr_str.ipynb 3
-from typing import Optional, Union
+from typing import Union, Optional as O
 from collections import defaultdict
 from fastcore.foundation import store_attr
 import warnings
@@ -36,13 +36,13 @@ def plain_repr(x):
         return repr(x)
 
 # %% ../nbs/00_repr_str.ipynb 9
-def lovely(x: Union[np.ndarray, np.generic], # The data you want to explore 
-            plain: bool=False,               # Plain old way
-            verbose: bool=False,             # Both summaty and plain
-            depth=0,                         # Show deeper summary, up to `depth`
-            lvl=0,                           # Indentation level 
-            color: bool=None                 # Override `get_config().color`
-            ) -> str:                        # The summary
+def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore 
+            plain   :bool   =False,                 # Plain old way
+            verbose :bool   =False,                 # Both summaty and plain
+            depth   :int    =0,                     # Show deeper summary, up to `depth`
+            lvl     :int    =0,                     # Indentation level 
+            color   :O[bool]=None                   # Override `get_config().color`
+            ) -> str:                               # The summary
 
     "Pretty-print the stats of a numpy array or scalar"
 

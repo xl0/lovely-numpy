@@ -1,4 +1,4 @@
-__version__ = "0.2.5"
+__version__ = "0.2.6-dev0"
 
 from .repr_str import *
 from .repr_rgb import *

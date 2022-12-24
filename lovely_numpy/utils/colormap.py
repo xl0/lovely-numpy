@@ -3,8 +3,8 @@
 # %% auto 0
 __all__ = ['InfCmap']
 
-# %% ../../nbs/03a_utils.colormap.ipynb 4
-from typing import Optional
+# %% ../../nbs/03a_utils.colormap.ipynb 3
+from typing import Optional as  O
 import numpy as np
 import matplotlib as mpl, matplotlib.cm as cm
 from matplotlib.colors import Colormap, to_rgba
@@ -34,11 +34,11 @@ class InfCmap():
     """
     def __init__(self,
                  cmap:  Colormap, # Base matplotlib colormap
-                 below: Optional[str] =None, # Values below 0
-                 above: Optional[str] =None, # Values above 1
-                 nan:   Optional[str] =None, # NaNs
-                 ninf:  Optional[str] =None, # -inf
-                 pinf:  Optional[str] =None, # +inf
+                 below: O[str] =None, # Values below 0
+                 above: O[str] =None, # Values above 1
+                 nan:   O[str] =None, # NaNs
+                 ninf:  O[str] =None, # -inf
+                 pinf:  O[str] =None, # +inf
                 ):
         _ = cmap(0) # one call to make sure the cmap is initialized
         lut = cmap._lut.copy()

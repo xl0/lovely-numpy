@@ -5,20 +5,20 @@ __all__ = ['plot']
 
 # %% ../nbs/02_repr_plt.ipynb 3
 import math
-from typing import Union, Tuple
-import numpy as np
-from matplotlib import pyplot as plt
-import matplotlib.axes
-import matplotlib
+from functools import cached_property
+from typing import Union, Tuple, Any, Optional as O
 
+import numpy as np
+from matplotlib import pyplot as plt, axes, figure, rc_context
+from IPython.core.pylabtools import print_figure
 
 from .repr_str import lovely, pretty_str
 from .utils import get_config
 
-# %% ../nbs/02_repr_plt.ipynb 5
-def normal_pdf( x: np.ndarray,
-                mean: Union[np.ndarray, float] =0.,
-                std: Union[np.ndarray, float] =1.):
+# %% ../nbs/02_repr_plt.ipynb 4
+def normal_pdf( x   :np.ndarray,
+                mean:Union[np.ndarray, float] =0.,
+                std :Union[np.ndarray, float] =1.):
     r"""Probability Distribution Function of Normal Distribution:
         $$f(x, \mu, \sigma)
         = \dfrac{1}
@@ -37,10 +37,10 @@ def normal_pdf( x: np.ndarray,
                 (std * np.sqrt((np.pi * 2)))
             )
 
-# %% ../nbs/02_repr_plt.ipynb 7
-def sample( x: np.ndarray,
-            max_s: int,
-            plt0: bool):
+# %% ../nbs/02_repr_plt.ipynb 6
+def sample( x       :np.ndarray,
+            max_s   :int,
+            plt0    :bool):
 
     # Samples up to max_s elements and returns
     #   - samples from x
@@ -64,12 +64,12 @@ def sample( x: np.ndarray,
 
     return (x, x_min, x_max)  
 
-# %% ../nbs/02_repr_plt.ipynb 8
-def find_xlims( x_min:  Union[float, None],
-                x_max:  Union[float, None],
-                x_mean: Union[float, None],
-                x_std:  Union[float, None],
-                center: str):
+# %% ../nbs/02_repr_plt.ipynb 7
+def find_xlims( x_min   :Union[float, None],
+                x_max   :Union[float, None],
+                x_mean  :Union[float, None],
+                x_std   :Union[float, None],
+                center  :str):
 
     assert center in ["zero", "mean", "range"]
     
@@ -91,7 +91,7 @@ def find_xlims( x_min:  Union[float, None],
         xlim_max = x_mean + max_div
     else: # center == "zero"
         # Center the plot around zero
-        abs_max_value = max(abs(x_min), abs(x_max))
+        abs_max_value = max(abs(x_min), abs(x_max), 1.)
         xlim_min, xlim_max = -abs_max_value, abs_max_value
     
 
@@ -101,9 +101,9 @@ def find_xlims( x_min:  Union[float, None],
 
     return (xlim_min, xlim_max)
 
-# %% ../nbs/02_repr_plt.ipynb 9
-def plot_histogram( x: np.ndarray,
-                    ax: matplotlib.axes.Axes):
+# %% ../nbs/02_repr_plt.ipynb 8
+def plot_histogram( x   :np.ndarray,
+                    ax  :axes.Axes):
     if x.size:
         # Around 50 items / bin seems to look good.
         # But don't go below 10 or above 100.
@@ -113,15 +113,16 @@ def plot_histogram( x: np.ndarray,
         # by the histogram
         xlims = ax.get_xlim()
         
-        bins = max(min(bins, 100), 10)
+        bins = min(bins, 100)
         bins = np.ceil( bins * ( (x.max()-x.min())/(xlims[1]-xlims[0]) ) ).astype(int)
-        
+        bins = max(bins, 10)
+
         ax.hist(x, bins=bins, color="deepskyblue", align="mid", density=True, zorder=4)
 
-# %% ../nbs/02_repr_plt.ipynb 10
-def plot_pdf(   x_mean: Union[float, None],
-                x_std: Union[float, None],
-                ax: matplotlib.axes.Axes):
+# %% ../nbs/02_repr_plt.ipynb 9
+def plot_pdf(   x_mean  :Union[float, None],
+                x_std   :Union[float, None],
+                ax      :axes.Axes):
     # PDF of normal distribution with the same mean and std.
 
     if x_std: # Not None and not 0.
@@ -132,9 +133,13 @@ def plot_pdf(   x_mean: Union[float, None],
         ax.plot(xl, normal_pdf(xl, mean=x_mean, std=x_std), zorder=5)
 
 
-# %% ../nbs/02_repr_plt.ipynb 11
-def plot_sigmas(x_min, x_max, x_mean, x_std, ax):
-    if x_min is not None and x_max is not None:
+# %% ../nbs/02_repr_plt.ipynb 10
+def plot_sigmas(x_min   :Union[float, None],
+                x_max   :Union[float, None],
+                x_mean  :Union[float, None],
+                x_std   :Union[float, None],
+                ax      :axes.Axes):
+    if x_min is not None and x_max is not None and x_std:
         xlims = ax.get_xlim()
         ylims = ax.get_ylim()
         # Make text bank part of the line under it
@@ -151,8 +156,10 @@ def plot_sigmas(x_min, x_max, x_mean, x_std, ax):
                 ax.text(x_pos, ylims[1]*0.95, greek, ha="center", va="top", bbox=bbox, zorder=5, weight=weight)
 
 
-# %% ../nbs/02_repr_plt.ipynb 12
-def plot_minmax(x_min, x_max, ax):
+# %% ../nbs/02_repr_plt.ipynb 11
+def plot_minmax(x_min   :Union[float, None],
+                x_max   :Union[float, None],
+                ax      :axes.Axes):
     if x_min is not None and x_max is not None:
         bbox = dict(boxstyle="round", fc="white", edgecolor="none", pad=0.)
         y_max = ax.get_ylim()[1]
@@ -182,21 +189,21 @@ def plot_minmax(x_min, x_max, ax):
         ax.axvline(x_max, 0, 1, c="red", zorder=2)
 
 
-# %% ../nbs/02_repr_plt.ipynb 13
+# %% ../nbs/02_repr_plt.ipynb 12
 def plot_str(t_str, ax):
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
     ax.text(xlim[0], ylim[1]*1.05, s=t_str)
 
-# %% ../nbs/02_repr_plt.ipynb 14
-def plot(   x: np.ndarray,  # 
-            center="zero",        # Center plot on  `zero`, `mean`, or `range`
-            max_s=10000,          # Draw up to this many samples. =0 to draw all
-            plt0=True,            # Take zero values into account
-            ax=None,              # Optionally, supply your own matplotlib axes.
-            summary=None,         # Summary string (to display on top). None=str(lovely(x))
-            ddof=0,               # Apply bias correction to std
-        ):
+# %% ../nbs/02_repr_plt.ipynb 13
+def fig_plot(   x       :np.ndarray,  # 
+            center  :str    ="zero",        # Center plot on  `zero`, `mean`, or `range`
+            max_s   :int    =10000,          # Draw up to this many samples. =0 to draw all
+            plt0    :Any    =True,            # Take zero values into account
+            ax      :O[axes.Axes]=None,              # Optionally, supply your own matplotlib axes.
+            summary :O[str] =None,         # Summary string (to display on top). None=str(lovely(x))
+            ddof    :int    =0,               # Apply bias correction to std
+        ) -> figure.Figure:
     """Plot statistics"""
 
     # Useful when you call `plot` from `lovely-tensors`/`-jax` and want to
@@ -215,10 +222,9 @@ def plot(   x: np.ndarray,  #
         t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
     t_str += summary
 
-    fig = None
     if not ax:
         fig, ax = plt.subplots(figsize=(12, 2))
-        fig.tight_layout()
+        fig.set_constrained_layout(True)
         plt.close(fig)
 
     xlims = find_xlims(x_min, x_max, x_mean, x_std, center)
@@ -236,5 +242,66 @@ def plot(   x: np.ndarray,  #
     
     ax.set_yticks([])
 
-    return fig
+    return ax.figure
 
+
+# %% ../nbs/02_repr_plt.ipynb 14
+# This is here for the monkey-patched tensor use case.
+# Gives the ability to call both .plt and .plt(ax=ax).  
+
+class PlotProxy(): 
+    """Flexible `PIL.Image.Image` wrapper"""
+
+    def __init__(self, x:np.ndarray):
+        self.x = x
+        self.params = dict( center="zero",
+                            max_s=10000,
+                            plt0=True,
+                            ddof=0,
+                            ax=None)
+
+    def __call__(   self,
+                    center  :O[str] =None,
+                    max_s   :O[int] =None,
+                    plt0    :Any    =None,
+                    ddof    :O[int] =None,
+                    ax      :O[axes.Axes]=None):
+
+        self.params.update( { k:v for
+                    k,v in locals().items()
+                    if k != "self" and v is not None } )
+        
+        _ = self.fig # Trigger figure generations
+        return self
+
+    @cached_property
+    def fig(self) -> figure.Figure:
+        return fig_plot( self.x, summary=lovely(self.x, color=False), **self.params)
+
+    def _repr_png_(self):
+        return print_figure(self.fig, fmt="png",
+            metadata={"Software": "Matplotlib, https://matplotlib.org/"})
+
+    def _repr_svg_(self):
+        # Metadata and context for a mode deterministic svg generation
+        metadata={
+            "Date": None,
+            "Creator": "Matplotlib, https://matplotlib.org/",
+        }
+        with rc_context({"svg.hashsalt": "1"}):
+            svg_repr = print_figure(self.fig, fmt="svg", metadata=metadata)
+        return svg_repr
+
+# %% ../nbs/02_repr_plt.ipynb 15
+def plot(   x       :np.ndarray,        # Your data
+            center  :str    ="zero",    # Center plot on  `zero`, `mean`, or `range`
+            max_s   :int    =10000,     # Draw up to this many samples. =0 to draw all
+            plt0    :Any    =True,      # Take zero values into account
+            ax      :O[axes.Axes]=None, # Optionally, supply your own matplotlib axes.
+            ddof    :int    =0,         # Apply bias correction to std
+        ) -> PlotProxy:
+
+    args = locals()
+    del args["x"]
+
+    return PlotProxy(x)(**args)

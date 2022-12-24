@@ -207,19 +207,19 @@ lo(eight_images).rgb
 lo(numbers+3).plt
 ```
 
-![](index_files/figure-gfm/cell-17-output-1.png)
+![](index_files/figure-gfm/cell-17-output-1.svg)
 
 ``` python
 lo(numbers+3).plt(center="mean", max_s=1000)
 ```
 
-![](index_files/figure-gfm/cell-18-output-1.png)
+![](index_files/figure-gfm/cell-18-output-1.svg)
 
 ``` python
 lo(numbers+3).plt(center="range")
 ```
 
-![](index_files/figure-gfm/cell-19-output-1.png)
+![](index_files/figure-gfm/cell-19-output-1.svg)
 
 ## Options
 
@@ -286,19 +286,19 @@ lovely(numbers) # Returns `str`, that's why you see ''.
     'array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
 
 ``` python
-rgb(numbers, denorm=in_stats) # Returns a `PIL.Image.Image`, just like lo(x).rgb
+rgb(numbers, denorm=in_stats)
 ```
 
 ![](index_files/figure-gfm/cell-28-output-1.png)
 
 ``` python
-chans(numbers*0.3+0.5) # Also a `PIL.Image.Image`
+chans(numbers*0.3+0.5)
 ```
 
 ![](index_files/figure-gfm/cell-29-output-1.png)
 
 ``` python
-plot(numbers) # Note: Returns matplotlib.Figure
+plot(numbers)
 ```
 
 ![](index_files/figure-gfm/cell-30-output-1.svg)
