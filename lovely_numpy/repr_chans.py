@@ -14,6 +14,7 @@ from IPython.core.pylabtools import print_figure
 from .repr_rgb import fig_rgb, rgb
 from .utils.colormap import InfCmap, get_cmap
 
+
 # %% ../nbs/05_repr_chans.ipynb 4
 def fig_chans( x           :np.ndarray,      # Input array
             cmap        :str="twilight",  # Use matplotlib colormap by this name

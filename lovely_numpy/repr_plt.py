@@ -196,13 +196,13 @@ def plot_str(t_str, ax):
     ax.text(xlim[0], ylim[1]*1.05, s=t_str)
 
 # %% ../nbs/02_repr_plt.ipynb 13
-def fig_plot(   x       :np.ndarray,  # 
-            center  :str    ="zero",        # Center plot on  `zero`, `mean`, or `range`
-            max_s   :int    =10000,          # Draw up to this many samples. =0 to draw all
-            plt0    :Any    =True,            # Take zero values into account
-            ax      :O[axes.Axes]=None,              # Optionally, supply your own matplotlib axes.
-            summary :O[str] =None,         # Summary string (to display on top). None=str(lovely(x))
-            ddof    :int    =0,               # Apply bias correction to std
+def fig_plot(   x     :np.ndarray,  # 
+                center  :str    ="zero",        # Center plot on  `zero`, `mean`, or `range`
+                max_s   :int    =10000,         # Draw up to this many samples. =0 to draw all
+                plt0    :Any    =True,          # Take zero values into account
+                ax      :O[axes.Axes]=None,     # Optionally, supply your own matplotlib axes.
+                summary :O[str] =None,          # Summary string (to display on top). None=str(lovely(x))
+                ddof    :int    =0,             # Apply bias correction to std
         ) -> figure.Figure:
     """Plot statistics"""
 
@@ -225,7 +225,7 @@ def fig_plot(   x       :np.ndarray,  #
     if not ax:
         fig, ax = plt.subplots(figsize=(12, 2))
         fig.set_constrained_layout(True)
-        plt.close(fig)
+        if get_config().fig_close: plt.close(fig)
 
     xlims = find_xlims(x_min, x_max, x_mean, x_std, center)
     ax.set_xlim(*xlims)
@@ -271,7 +271,7 @@ class PlotProxy():
                     k,v in locals().items()
                     if k != "self" and v is not None } )
         
-        _ = self.fig # Trigger figure generations
+        _ = self.fig # Trigger figure generation
         return self
 
     @cached_property

@@ -23,7 +23,8 @@ class Config(SimpleNamespace):
             color         = True, # ANSI colors in text
             repr          = None, # Use func e.g. `lovely` for `repr(np.ndarray)`
             str           = None, # Use func e.g. `lovely` for `str(np.ndarray)`
-            plt_seed      = 42    # Sampling seed for `plot`. None=random.  
+            plt_seed      = 42,   # Sampling seed for `plot`
+            fig_close     = True, # Close matplotlib Figure
     ):
         super().__init__(**{k:v for k,v in locals().items() if k not in ["self", "__class__"]})
 
@@ -49,6 +50,7 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
                 repr            :Optional[Union[Default,Callable]]=D,
                 str             :Optional[Union[Default,Callable]]=D,
                 plt_seed        :Optional[Union[Default,int]]     =D,
+                fig_close       :Optional[Union[Default,bool]]    =D,
                 ) -> None:
 
     "Set config variables"
@@ -90,6 +92,7 @@ def config( precision       :Optional[Union[Default,int]]     =D,
             repr            :Optional[Union[Default,Callable]]=D,
             str             :Optional[Union[Default,Callable]]=D,
             plt_seed        :Optional[Union[Default,int]]     =D,
+            fig_close       :Optional[Union[Default,bool]]    =D,
             ):
     "Context manager for temporarily setting config options"
     new_opts = { k:v for k, v in locals().items() if v != D}

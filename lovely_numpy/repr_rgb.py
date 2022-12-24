@@ -13,6 +13,7 @@ from IPython.core.pylabtools import print_figure
 
 
 from .utils.tile2d import hypertile
+from .utils import get_config
 
 # %% ../nbs/01_repr_rgb.ipynb 4
 def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
@@ -53,7 +54,7 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
     fig = None
     if not ax:
         fig = plt.figure(frameon=False, figsize=(x.shape[1] * 0.01, x.shape[0]*0.01) )
-        plt.close(fig)
+        if get_config().fig_close: plt.close(fig)
         fig.set_dpi(100)
 
         ax = fig.add_axes([0,0,1,1])

@@ -312,23 +312,29 @@ lo(numbers).rgb(in_stats).fig # matplotlib figure
 ![](index_files/figure-gfm/cell-31-output-1.svg)
 
 ``` python
-lo(numbers*0.3+0.5).chans.fig # matplotlib figure
-```
-
-![](index_files/figure-gfm/cell-32-output-1.svg)
-
-``` python
 lo(numbers).plt.fig.savefig('pretty.svg') # Save it
 ```
 
 ``` python
-fig, (ax1, ax2) = plt.subplots(2, figsize=(10,4))
-ax1.set_axis_off()
-plt.close(fig)
-fig.tight_layout()
+!file pretty.svg
+```
 
-lo(numbers_01).chans(ax=ax1)
-lo(numbers_01).plt(ax=ax2)
+    pretty.svg: SVG Scalable Vector Graphics image
+
+``` python
+fig = plt.figure(figsize=(8,3))
+fig.set_constrained_layout(True)
+gs = fig.add_gridspec(2,2)
+ax1 = fig.add_subplot(gs[0, :])
+ax2 = fig.add_subplot(gs[1, 0])
+ax3 = fig.add_subplot(gs[1,1:])
+
+ax2.set_axis_off()
+ax3.set_axis_off()
+
+lo(numbers_01).plt(ax=ax1)
+lo(numbers_01).rgb(ax=ax2)
+lo(numbers_01).chans(ax=ax3);
 ```
 
 ![](index_files/figure-gfm/cell-34-output-1.svg)

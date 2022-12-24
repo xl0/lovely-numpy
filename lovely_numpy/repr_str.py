@@ -46,7 +46,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
 
     "Pretty-print the stats of a numpy array or scalar"
 
-    if plain or not np.isrealobj(x):
+    if plain or not isinstance(x, (np.ndarray, np.generic)) or not np.isrealobj(x):
         return plain_repr(x)
     
     if isinstance(x, np.generic):
