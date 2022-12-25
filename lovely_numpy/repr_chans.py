@@ -16,19 +16,19 @@ from .utils.colormap import InfCmap, get_cmap
 from .utils.config import config, get_config
 
 # %% ../nbs/05_repr_chans.ipynb 4
-def fig_chans( x           :np.ndarray,      # Input array
-            cmap        :str="twilight",  # Use matplotlib colormap by this name
-            cm_below    :str="blue",
-            cm_above    :str="red",
-            cm_ninf     :str="cyan",
-            cm_pinf     :str="fuchsia",
-            cm_nan      :str="yellow",
-            gutter_px   :int=3,         # Draw write gutters when tiling the images
-            frame_px    :int=1,         # Draw black frame around each image
-            scale       :int=1,         # Stretch the image. Only itegers please.
-            cl          :Any=True,
-            view_width  :int=966,
-            ax          :O[axes.Axes]=None
+def fig_chans(  x           :np.ndarray,      # Input array
+                cmap        :str="twilight",  # Use matplotlib colormap by this name
+                cm_below    :str="blue",
+                cm_above    :str="red",
+                cm_ninf     :str="cyan",
+                cm_pinf     :str="fuchsia",
+                cm_nan      :str="yellow",
+                gutter_px   :int=3,         # Draw write gutters when tiling the images
+                frame_px    :int=1,         # Draw black frame around each image
+                scale       :int=1,         # Stretch the image. Only itegers please.
+                cl          :Any=True,
+                view_width  :int=966,
+                ax          :O[axes.Axes]=None
         ) -> figure.Figure:
     """
     Process individual channels of a ndarray that can be interpreted as as image
@@ -52,7 +52,7 @@ def fig_chans( x           :np.ndarray,      # Input array
 class ChanProxy():   
     def __init__(self, x: np.ndarray):
         self.x = x
-        self.params = dict( cmap        = "twilight", 
+        self.params = dict( cmap        ="twilight", 
                             cm_below    ="blue",
                             cm_above    ="red",
                             cm_ninf     ="cyan",
@@ -87,13 +87,7 @@ class ChanProxy():
 
     @cached_property
     def fig(self) -> figure.Figure:
-        if get_config().fig_show:
-            with config(fig_close=False):
-                fig = fig_chans(self.x, **self.params)
-            plt.show()
-        else:
-            fig = fig_chans(self.x, **self.params)
-        return fig
+        return fig_chans(self.x, **self.params)
 
     def _repr_png_(self):
         return print_figure(self.fig, fmt="png", pad_inches=0,

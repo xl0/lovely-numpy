@@ -13,7 +13,7 @@ from IPython.core.pylabtools import print_figure
 
 
 from .utils.tile2d import hypertile
-from .utils import get_config, config
+from .utils import get_config
 
 # %% ../nbs/01_repr_rgb.ipynb 4
 def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
@@ -51,10 +51,13 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
 
     if clip: np.clip(x, 0, 1, out=x)
 
-    fig = None
-    if not ax:
+    cfg = get_config()
+    close = cfg.fig_close and not cfg.fig_show # Don't close if requested to show
+    show = cfg.fig_show and ax is None # Don't show the figure if axes was provided
+
+    if ax is None:
         fig = plt.figure(frameon=False, figsize=(x.shape[1] * 0.01, x.shape[0]*0.01) )
-        if get_config().fig_close: plt.close(fig)
+        if close: plt.close(fig)
         fig.set_dpi(100)
 
         ax = fig.add_axes([0,0,1,1])
@@ -62,6 +65,7 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
         ax.set_xlim(0, x.shape[1]+1)
 
     ax.imshow(x, interpolation="none")
+    if show: plt.show()
 
     return ax.figure
 
@@ -99,13 +103,7 @@ class RGBProxy():
 
     @cached_property
     def fig(self) -> figure.Figure:
-        if get_config().fig_show:
-            with config(fig_close=False):
-                fig = fig_rgb(self.x, **self.params)
-            plt.show()
-        else: 
-            fig = fig_rgb(self.x, **self.params)
-        return fig
+        return fig_rgb(self.x, **self.params)
 
     def _repr_png_(self):
         return print_figure(self.fig, fmt="png", pad_inches=0,

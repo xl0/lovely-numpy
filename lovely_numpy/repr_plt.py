@@ -222,10 +222,14 @@ def fig_plot(   x     :np.ndarray,  #
         t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
     t_str += summary
 
+    cfg = get_config()
+    close = cfg.fig_close and not cfg.fig_show # Don't close if requested to show
+    show = cfg.fig_show and ax is None # Don't show the figure if axes was provided
+
     if not ax:
         fig, ax = plt.subplots(figsize=(12, 2))
         fig.set_constrained_layout(True)
-        if get_config().fig_close: plt.close(fig)
+        if close: plt.close(fig)
 
     xlims = find_xlims(x_min, x_max, x_mean, x_std, center)
     ax.set_xlim(*xlims)
@@ -241,6 +245,8 @@ def fig_plot(   x     :np.ndarray,  #
     plot_str(t_str, ax)
     
     ax.set_yticks([])
+
+    if show: plt.show()
 
     return ax.figure
 
@@ -276,13 +282,7 @@ class PlotProxy():
 
     @cached_property
     def fig(self) -> figure.Figure:
-        if get_config().fig_show:
-            with config(fig_close=False):
-                fig = fig_plot( self.x, **self.params)
-            plt.show()
-        else:
-            fig = fig_plot( self.x, **self.params)
-        return fig
+        return fig_plot( self.x, **self.params)
 
     def _repr_png_(self):
         return print_figure(self.fig, fmt="png",

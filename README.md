@@ -15,6 +15,12 @@
 pip install lovely-numpy
 ```
 
+or
+
+``` sh
+conda install -c conda-forge lovely-numpy
+```
+
 ## How to use
 
 How often do you find yourself debugging NumPy code? You dump your
