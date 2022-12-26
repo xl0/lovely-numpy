@@ -28,7 +28,7 @@ dtnames =   {   "float16": "f16",
             }
 
 def short_dtype(x: Union[np.ndarray, np.generic]):
-    return dtnames.get(x.dtype.name, str(x.dtype)[6:])
+    return dtnames.get(x.dtype.name, x.dtype)
 
 # %% ../nbs/00_repr_str.ipynb 8
 def plain_repr(x):
@@ -46,12 +46,14 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
 
     "Pretty-print the stats of a numpy array or scalar"
 
-    if plain or not isinstance(x, (np.ndarray, np.generic)) or not np.isrealobj(x):
+    if plain or not isinstance(x, (np.ndarray, np.generic)) or np.iscomplexobj(x):
         return plain_repr(x)
-    
+
+    conf = get_config()
+
     if isinstance(x, np.generic):
         tname = None
-    else: 
+    else:
         tname = "array" if type(x) == np.ndarray else type(x).__name__.split(".")[-1]
 
     shape = str(list(x.shape)) if x.ndim else None
@@ -68,9 +70,18 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
         res += "\n" + plain_repr(x)
 
     if depth and x.ndim > 1:
-        res += "\n" + "\n".join([
-            " " * get_config().indent * (lvl+1) +
-            str(lovely(x[i,:], depth=depth-1, lvl=lvl+1))
-            for i in range(x.shape[0])])
+        deep_width = min(x.shape[0], conf.deeper_width) # Print at most this many lines
+        deep_lines = [ " "*conf.indent*(lvl+1) + lovely(x[i,:], depth=depth-1, lvl=lvl+1)
+                            for i in range(deep_width)]
+
+        # If we were limited by width, print ...
+        if deep_width < x.shape[0]: deep_lines.append(" "*conf.indent*(lvl+1) + "...")
+
+        res += "\n" + "\n".join(deep_lines)
+
+        # res += "\n" + "\n".join([
+        #     " " * get_config().indent * (lvl+1) +
+        #     str(lovely(x[i,:], depth=depth-1, lvl=lvl+1))
+        #     for i in range(x.shape[0])])
 
     return res

@@ -21,6 +21,7 @@ class Config(SimpleNamespace):
             sci_mode      = None, # Sci mode (2.3e4). None=auto
             indent        = 2,    # Indent for .deeper()
             color         = True, # ANSI colors in text
+            deeper_width  =9,     # For .deeper, width per level
             repr          = None, # Use func e.g. `lovely` for `repr(np.ndarray)`
             str           = None, # Use func e.g. `lovely` for `str(np.ndarray)`
             plt_seed      = 42,   # Sampling seed for `plot`
@@ -47,6 +48,7 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
                 sci_mode        :Optional[Union[Default,bool]]    =D,
                 indent          :Optional[Union[Default,bool]]    =D,
                 color           :Optional[Union[Default,bool]]    =D,
+                deeper_width    :Optional[Union[Default,int]]     =D,
                 repr            :Optional[Union[Default,Callable]]=D,
                 str             :Optional[Union[Default,Callable]]=D,
                 plt_seed        :Optional[Union[Default,int]]     =D,
@@ -90,6 +92,7 @@ def config( precision       :Optional[Union[Default,int]]     =D,
             sci_mode        :Optional[Union[Default,bool]]    =D,
             indent          :Optional[Union[Default,bool]]    =D,
             color           :Optional[Union[Default,bool]]    =D,
+            deeper_width    :Optional[Union[Default,int]]     =D,
             repr            :Optional[Union[Default,Callable]]=D,
             str             :Optional[Union[Default,Callable]]=D,
             plt_seed        :Optional[Union[Default,int]]     =D,

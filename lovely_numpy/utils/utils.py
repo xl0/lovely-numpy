@@ -21,7 +21,7 @@ def sci_mode(f: float):
 
 # %% ../../nbs/03_utils.utils.ipynb 7
 # Convert an ndarray or scalar into a string.
-# This only looks good for small tensors, which is how it's intended to be used.
+# This only looks good for small arrays, which is how it's intended to be used.
 def pretty_str(x):
     """A slightly better way to print `float`-y values.
     Works for `np.ndarray`, `torch.Tensor`, `jax.DeviceArray`, and scalars."""
