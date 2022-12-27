@@ -5,7 +5,6 @@ __all__ = ['plot']
 
 # %% ../nbs/02_repr_plt.ipynb 3
 import math
-from functools import cached_property
 from typing import Union, Tuple, Any, Optional as O
 
 import numpy as np
@@ -14,6 +13,8 @@ from IPython.core.pylabtools import print_figure
 
 from .repr_str import lovely, pretty_str
 from .utils import get_config, config
+from .utils.utils import cached_property
+
 
 # %% ../nbs/02_repr_plt.ipynb 4
 def normal_pdf( x   :np.ndarray,

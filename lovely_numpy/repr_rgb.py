@@ -5,7 +5,6 @@ __all__ = ['rgb']
 
 # %% ../nbs/01_repr_rgb.ipynb 3
 from typing import Union, Any, Optional as O
-from functools import cached_property
 
 import numpy as np
 from matplotlib import pyplot as plt, axes, figure, rcParams
@@ -13,6 +12,7 @@ from IPython.core.pylabtools import print_figure
 
 
 from .utils.tile2d import hypertile
+from .utils.utils import cached_property
 from .utils import get_config
 
 # %% ../nbs/01_repr_rgb.ipynb 4

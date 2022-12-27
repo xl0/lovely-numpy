@@ -61,7 +61,8 @@ class InfCmap():
     def __call__(self, t: np.ndarray):
         vals = ((t + 1) / 2)
         cmax = self.cmax
-        lut_idxs = (vals * cmax).astype(np.int64)
+        with np.errstate(invalid='ignore'):
+            lut_idxs = (vals * cmax).astype(np.int64)
         
         lut_idxs[ vals < 0. ] = cmax+1
         lut_idxs[ vals > 1. ] = cmax+2

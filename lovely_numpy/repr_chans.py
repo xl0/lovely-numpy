@@ -5,7 +5,6 @@ __all__ = ['chans']
 
 # %% ../nbs/05_repr_chans.ipynb 3
 from typing import Any, Optional as O
-from functools import cached_property
 
 import numpy as np
 from matplotlib import axes, figure, pyplot as plt
@@ -14,6 +13,7 @@ from IPython.core.pylabtools import print_figure
 from .repr_rgb import fig_rgb, rgb
 from .utils.colormap import InfCmap, get_cmap
 from .utils.config import config, get_config
+from .utils.utils import cached_property
 
 # %% ../nbs/05_repr_chans.ipynb 4
 def fig_chans(  x           :np.ndarray,      # Input array
