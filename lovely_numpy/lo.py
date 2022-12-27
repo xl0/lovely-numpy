@@ -6,7 +6,6 @@ __all__ = ['Lo', 'lo']
 # %% ../nbs/10_lo.ipynb 3
 from typing import Any, Union, Optional as O
 from matplotlib import pyplot as plt, axes, figure
-from functools import cached_property
 
 
 import numpy as np
