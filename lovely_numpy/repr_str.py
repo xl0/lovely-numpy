@@ -3,17 +3,17 @@
 # %% auto 0
 __all__ = ['lovely']
 
-# %% ../nbs/00_repr_str.ipynb 3
+# %% ../nbs/00_repr_str.ipynb 4
 from typing import Union, Optional as O
 from collections import defaultdict
 from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, sparse_join, np_to_str_common
+from .utils import pretty_str, sparse_join, np_to_str_common, in_debugger
 from .utils.config import get_config, set_config, config
 
-# %% ../nbs/00_repr_str.ipynb 5
+# %% ../nbs/00_repr_str.ipynb 6
 dtnames =   {   "float16": "f16",
                 "float32": "f32",
                 "float64": "", # Default dtype in numpy
@@ -30,12 +30,12 @@ dtnames =   {   "float16": "f16",
 def short_dtype(x: Union[np.ndarray, np.generic]):
     return dtnames.get(x.dtype.name, x.dtype)
 
-# %% ../nbs/00_repr_str.ipynb 8
+# %% ../nbs/00_repr_str.ipynb 9
 def plain_repr(x):
     with config(repr=None):
         return repr(x)
 
-# %% ../nbs/00_repr_str.ipynb 9
+# %% ../nbs/00_repr_str.ipynb 10
 def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore 
             plain   :bool   =False,                 # Plain old way
             verbose :bool   =False,                 # Both summaty and plain
@@ -60,6 +60,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     type_str = sparse_join([tname, shape], sep="")
 
     color = get_config().color if color is None else color
+    if in_debugger(): color = False
     common = np_to_str_common(x, color=color)
     dtype = short_dtype(x)
     
