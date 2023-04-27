@@ -15,7 +15,6 @@ from .repr_str import lovely, pretty_str
 from .utils import get_config, config
 from .utils.utils import cached_property
 
-
 # %% ../nbs/02_repr_plt.ipynb 4
 def normal_pdf( x   :np.ndarray,
                 mean:Union[np.ndarray, float] =0.,
@@ -50,7 +49,6 @@ def sample( x       :np.ndarray,
     
     # Ignore NaN and Inf.
     x = x[ np.isfinite(x) ]
-
     x_min = x_max = None
 
     if x.size: 
