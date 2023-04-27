@@ -197,6 +197,7 @@ def plot_str(t_str, ax):
     ax.text(xlim[0], ylim[1]*1.05, s=t_str)
 
 # %% ../nbs/02_repr_plt.ipynb 13
+@config(show_mem_above=np.inf)
 def fig_plot(   x     :np.ndarray,  # 
                 center  :str    ="zero",        # Center plot on  `zero`, `mean`, or `range`
                 max_s   :int    =10000,         # Draw up to this many samples. =0 to draw all

@@ -10,7 +10,7 @@ from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, sparse_join, np_to_str_common, in_debugger
+from .utils import pretty_str, sparse_join, np_to_str_common, in_debugger, bytes_to_human
 from .utils.config import get_config, set_config, config
 
 # %% ../nbs/00_repr_str.ipynb 6
@@ -61,28 +61,33 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
 
     color = get_config().color if color is None else color
     if in_debugger(): color = False
+
+    numel = None
+    if x.shape and max(x.shape) != x.size:
+        numel = f"n={x.size}"
+        if get_config().show_mem_above <= x.nbytes:
+            numel = sparse_join([numel, f"({bytes_to_human(x.nbytes)})"])
+    elif get_config().show_mem_above <= x.nbytes:
+        numel = bytes_to_human(x.nbytes)
+
     common = np_to_str_common(x, color=color)
     dtype = short_dtype(x)
     
     vals = pretty_str(x) if 0 < x.size <= 10 else None
-    res = sparse_join([type_str, dtype, common, vals])
+    res = sparse_join([type_str, dtype, numel, common, vals])
 
     if verbose:
         res += "\n" + plain_repr(x)
 
     if depth and x.ndim > 1:
         deep_width = min(x.shape[0], conf.deeper_width) # Print at most this many lines
-        deep_lines = [ " "*conf.indent*(lvl+1) + lovely(x[i,:], depth=depth-1, lvl=lvl+1)
-                            for i in range(deep_width)]
+        with config(show_mem_above=np.inf):
+            deep_lines = [ " "*conf.indent*(lvl+1) + lovely(x[i,:], depth=depth-1, lvl=lvl+1)
+                                for i in range(deep_width)]
 
-        # If we were limited by width, print ...
-        if deep_width < x.shape[0]: deep_lines.append(" "*conf.indent*(lvl+1) + "...")
+            # If we were limited by width, print ...
+            if deep_width < x.shape[0]: deep_lines.append(" "*conf.indent*(lvl+1) + "...")
 
-        res += "\n" + "\n".join(deep_lines)
-
-        # res += "\n" + "\n".join([
-        #     " " * get_config().indent * (lvl+1) +
-        #     str(lovely(x[i,:], depth=depth-1, lvl=lvl+1))
-        #     for i in range(x.shape[0])])
+            res += "\n" + "\n".join(deep_lines)
 
     return res

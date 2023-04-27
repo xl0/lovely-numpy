@@ -73,7 +73,7 @@ from lovely_numpy import lo
 lo(numbers)
 ```
 
-    array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+    array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073
 
 Better, eh?
 
@@ -102,7 +102,7 @@ lo(spicy) # Spicy stuff
 lo(np.zeros((10, 10))) # A zero array - make it obvious
 ```
 
-    array[10, 10] all_zeros
+    array[10, 10] n=100 all_zeros
 
 ``` python
 lo(spicy, verbose=True)
@@ -119,7 +119,7 @@ lo(spicy, verbose=True)
 lo(numbers.transpose(2,1,0)).deeper
 ```
 
-    array[3, 196, 196] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+    array[3, 196, 196] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073
       array[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036
       array[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973
       array[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178
@@ -154,7 +154,7 @@ The important queston - is it our man?
 lo(numbers).rgb
 ```
 
-![](index_files/figure-gfm/cell-11-output-1.png)
+![](index_files/figure-commonmark/cell-11-output-1.png)
 
 *Maaaaybe?* Looks like someone normalized him.
 
@@ -166,7 +166,7 @@ in_stats = ( (0.485, 0.456, 0.406),     # mean
 lo(numbers).rgb(denorm=in_stats)
 ```
 
-![](index_files/figure-gfm/cell-12-output-1.png)
+![](index_files/figure-commonmark/cell-12-output-1.png)
 
 It’s indeed our hero, the Tenchman!
 
@@ -181,13 +181,13 @@ numbers_01 = (numbers*std + mean).clip(0,1)
 lo(numbers_01)
 ```
 
-    array[196, 196, 3] n=115248 x∈[0., 1.000] μ=0.361 σ=0.248
+    array[196, 196, 3] n=115248 (0.9Mb) x∈[0., 1.000] μ=0.361 σ=0.248
 
 ``` python
 lo(numbers_01).chans
 ```
 
-![](index_files/figure-gfm/cell-14-output-1.png)
+![](index_files/figure-commonmark/cell-14-output-1.png)
 
 ## Grouping
 
@@ -202,13 +202,13 @@ eight_images = (eight_images
 lo(eight_images)
 ```
 
-    array[2, 2, 2, 196, 196, 3] n=921984 x∈[0., 1.000] μ=0.382 σ=0.319
+    array[2, 2, 2, 196, 196, 3] n=921984 (7.0Mb) x∈[0., 1.000] μ=0.382 σ=0.319
 
 ``` python
 lo(eight_images).rgb
 ```
 
-![](index_files/figure-gfm/cell-16-output-1.png)
+![](index_files/figure-commonmark/cell-16-output-1.png)
 
 ## Histogram
 
@@ -216,19 +216,19 @@ lo(eight_images).rgb
 lo(numbers+3).plt
 ```
 
-![](index_files/figure-gfm/cell-17-output-1.svg)
+![](index_files/figure-commonmark/cell-17-output-1.svg)
 
 ``` python
 lo(numbers+3).plt(center="mean", max_s=1000)
 ```
 
-![](index_files/figure-gfm/cell-18-output-1.svg)
+![](index_files/figure-commonmark/cell-18-output-1.svg)
 
 ``` python
 lo(numbers+3).plt(center="range")
 ```
 
-![](index_files/figure-gfm/cell-19-output-1.svg)
+![](index_files/figure-commonmark/cell-19-output-1.svg)
 
 ## Options \| [Docs](03d_utils.config.html)
 
@@ -289,25 +289,25 @@ lovely(numbers) # Returns `str`, that's why you see ''.
 # Note:  lo(x) returns a wrapper object with a `__repr__` and other methods.
 ```
 
-    'array[196, 196, 3] f32 n=115248 x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
+    'array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
 
 ``` python
 rgb(numbers, denorm=in_stats)
 ```
 
-![](index_files/figure-gfm/cell-28-output-1.png)
+![](index_files/figure-commonmark/cell-28-output-1.png)
 
 ``` python
 chans(numbers*0.3+0.5)
 ```
 
-![](index_files/figure-gfm/cell-29-output-1.png)
+![](index_files/figure-commonmark/cell-29-output-1.png)
 
 ``` python
 plot(numbers)
 ```
 
-![](index_files/figure-gfm/cell-30-output-1.svg)
+![](index_files/figure-commonmark/cell-30-output-1.svg)
 
 ## Matplotlib integration \| [Docs](matplotlib.html)
 
@@ -315,7 +315,7 @@ plot(numbers)
 lo(numbers).rgb(in_stats).fig # matplotlib figure
 ```
 
-![](index_files/figure-gfm/cell-31-output-1.svg)
+![](index_files/figure-commonmark/cell-31-output-1.png)
 
 ``` python
 lo(numbers).plt.fig.savefig('pretty.svg') # Save it
@@ -343,4 +343,4 @@ lo(numbers_01).rgb(ax=ax2)
 lo(numbers_01).chans(ax=ax3);
 ```
 
-![](index_files/figure-gfm/cell-34-output-1.svg)
+![](index_files/figure-commonmark/cell-34-output-1.png)
