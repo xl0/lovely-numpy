@@ -18,12 +18,12 @@ from .utils import get_config
 # %% ../nbs/01_repr_rgb.ipynb 4
 def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
             denorm      :Any    =None,      # Reverse per-channel normalizatoin
-            cl          :Any    =True,      # Channel-last
+            cl          :Any    =True,      # Channel-last format
             gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
             frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
             scale       :int    =1,         # Stretch the image. Only itegers please.
             view_width  :int    =966,       # target width of the image 
-            clip        :bool   =True,      # Selently clip RGB values to [0, 1]
+            clip        :bool   =True,      # Selently clip RGB values to [0, 1] for float, and [0, 255] for uint
             ax          :O[axes.Axes]=None  # Matplotlib axes
         ) -> figure.Figure:
     
@@ -49,7 +49,12 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
                         frame_px=frame_px,
                         view_width=view_width)
 
-    if clip: np.clip(x, 0, 1, out=x)
+    # matplotlib does not support float16 or bool. Convert both to float32.
+    if (x.dtype in  (np.float16, np.bool_)): x = x.astype(np.float32) 
+
+    if clip:
+        if np.issubdtype(x.dtype, np.integer): np.clip(x, 0, 255, out=x)
+        else: np.clip(x, 0, 1, out=x)
 
     cfg = get_config()
     close = cfg.fig_close and not cfg.fig_show # Don't close if requested to show
@@ -69,7 +74,7 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
 
     return ax.figure
 
-# %% ../nbs/01_repr_rgb.ipynb 5
+# %% ../nbs/01_repr_rgb.ipynb 6
 class RGBProxy():
     """Flexible `PIL.Image.Image` wrapper"""
     
@@ -109,7 +114,7 @@ class RGBProxy():
         return print_figure(self.fig, fmt="png", pad_inches=0,
             metadata={"Software": "Matplotlib, https://matplotlib.org/"})
 
-# %% ../nbs/01_repr_rgb.ipynb 6
+# %% ../nbs/01_repr_rgb.ipynb 7
 def rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
         denorm      :Any    =None,      # Reverse per-channel normalizatoin
         cl          :Any    =True,      # Channel-last
