@@ -5,9 +5,30 @@
 
 <div>
 
-## [Read full docs](https://xl0.github.io/lovely-numpy) \| ❤️ [Lovely Tensors](https://github.com/xl0/lovely-tensors) \| 💘 [Lovely `JAX`](https://github.com/xl0/lovely-jax) \| [Discord](https://discord.gg/4NxRV7NH)
+## [Read full docs](https://xl0.github.io/lovely-numpy)
 
 </div>
+
+### More lovely stuff
+
+##### Working with numbers
+
+- [PyTorch](https://pytorch.org/): ❤️ [Lovely
+  Tensors](https://github.com/xl0/lovely-tensors)
+- [JAX](https://jax.readthedocs.io/): 💘 [Lovely
+  `JAX`](https://github.com/xl0/lovely-jax)
+- [TinyGrad](https://github.com/tinygrad/tinygrad): 🫀 [Lovely
+  Grad](https://github.com/xl0/lovely-grad)
+
+##### Proompting
+
+- Log prompts with 💌 [Lovely
+  Prompts](https://github.com/xl0/lovely-prompts)
+- Better LangChain: 😎 [Proompter](https://github.com/xl0/proompter)
+
+##### Community
+
+- [Discord](https://discord.gg/qBaqauUWXP) (Now the link works!)
 
 ## Install
 
