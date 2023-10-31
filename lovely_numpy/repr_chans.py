@@ -26,7 +26,7 @@ def fig_chans(  x           :np.ndarray,      # Input array
                 gutter_px   :int=3,         # Draw write gutters when tiling the images
                 frame_px    :int=1,         # Draw black frame around each image
                 scale       :int=1,         # Stretch the image. Only itegers please.
-                cl          :Any=True,
+                cl          :Any=True,      # Channels-last format
                 view_width  :int=966,
                 ax          :O[axes.Axes]=None
         ) -> figure.Figure:
@@ -35,9 +35,11 @@ def fig_chans(  x           :np.ndarray,      # Input array
     """
     
     assert x.ndim >= 2, f"Expected a 2+ dim input, got {x.shape}={x.ndim}"
-    if x.ndim == 2: x = x[None]
-    
-    if cl: # Convert to [..., C, H, W].
+    if x.ndim == 2:
+        x = x[None] # Add a channel dim in front.
+        cl = False
+
+    if cl: # Convert to [...C, H, W,]. This way channels are see as separate 2d images that will be tiled.
         x = np.swapaxes(np.swapaxes(x, -2, -1), -3, -2)
 
     ### XXX Do we want a way to pass a custom cmap instead of mpl one?
