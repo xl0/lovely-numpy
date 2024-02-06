@@ -28,7 +28,7 @@ dtnames =   {   "float16": "f16",
             }
 
 def short_dtype(x: Union[np.ndarray, np.generic]):
-    return dtnames.get(x.dtype.name, x.dtype)
+    return dtnames.get(x.dtype.name, str(x.dtype))
 
 # %% ../nbs/00_repr_str.ipynb 9
 def plain_repr(x):
