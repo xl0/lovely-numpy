@@ -61,7 +61,7 @@ def ansi_color(s: str, col: str, use_color=True):
 
 # %% ../../nbs/03_utils.utils.ipynb 18
 def bytes_to_human(num_bytes):
-    units = ['b', 'Kb', 'Mb', 'Gb']
+    units = ['B', 'KB', 'MB', 'GB']
 
     value = num_bytes
     for unit in units:
