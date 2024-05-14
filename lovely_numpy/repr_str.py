@@ -36,17 +36,17 @@ def plain_repr(x):
         return repr(x)
 
 # %% ../nbs/00_repr_str.ipynb 10
-def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore 
+def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore
             plain   :bool   =False,                 # Plain old way
             verbose :bool   =False,                 # Both summaty and plain
             depth   :int    =0,                     # Show deeper summary, up to `depth`
-            lvl     :int    =0,                     # Indentation level 
+            lvl     :int    =0,                     # Indentation level
             color   :O[bool]=None                   # Override `get_config().color`
             ) -> str:                               # The summary
 
     "Pretty-print the stats of a numpy array or scalar"
 
-    if plain or not isinstance(x, (np.ndarray, np.generic)) or np.iscomplexobj(x):
+    if plain or not isinstance(x, (np.ndarray, np.generic)) or np.iscomplexobj(x) or not np.issubdtype(x.dtype, np.number):
         return plain_repr(x)
 
     conf = get_config()
@@ -72,7 +72,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
 
     common = np_to_str_common(x, color=color)
     dtype = short_dtype(x)
-    
+
     vals = pretty_str(x) if 0 < x.size <= 10 else None
     res = sparse_join([type_str, dtype, numel, common, vals])
 
