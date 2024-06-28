@@ -22,11 +22,11 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
             gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
             frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
             scale       :int    =1,         # Stretch the image. Only itegers please.
-            view_width  :int    =966,       # target width of the image 
+            view_width  :int    =966,       # target width of the image
             clip        :bool   =True,      # Selently clip RGB values to [0, 1] for float, and [0, 255] for uint
             ax          :O[axes.Axes]=None  # Matplotlib axes
         ) -> figure.Figure:
-    
+
     assert x.ndim >= 3, f"Expecting 3 or more dimension input, got shape=({x.shape})"
     assert x.size > 0, f"Expecting non-empty input, got shape=({x.shape})"
     # swap channels if it's not channe-last already
@@ -50,7 +50,7 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
                         view_width=view_width)
 
     # matplotlib does not support float16 or bool. Convert both to float32.
-    if (x.dtype in  (np.float16, np.bool_)): x = x.astype(np.float32) 
+    if (x.dtype in  (np.float16, np.bool_)): x = x.astype(np.float32)
 
     if clip:
         if np.issubdtype(x.dtype, np.integer): np.clip(x, 0, 255, out=x)
@@ -77,13 +77,13 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
 # %% ../nbs/01_repr_rgb.ipynb 6
 class RGBProxy():
     """Flexible `PIL.Image.Image` wrapper"""
-    
+
     def __init__(self, x:np.ndarray):
         assert x.ndim >= 3, f"Expecting at least 3 dimensions, got shape{x.shape}={x.size}"
         self.x=x
         self.params = dict( denorm      = None,
                             cl          = True,
-                            gutter_px   = 3,     
+                            gutter_px   = 3,
                             frame_px    = 1,
                             scale       = 1,
                             view_width  = 966,
@@ -99,7 +99,7 @@ class RGBProxy():
                 view_width  :O[int] =None,
                 clip        :Any    =None,
                 ax          :O[axes.Axes]=None):
-        
+
         self.params.update( { k:v for
                             k,v in locals().items()
                             if k != "self" and v is not None } )
@@ -121,12 +121,12 @@ def rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[
         gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
         frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
         scale       :int    =1,         # Stretch the image. Only itegers please.
-        view_width  :int    =966,       # target width of the image 
+        view_width  :int    =966,       # target width of the image
         clip        :bool   =True,      # Selently clip RGB values to [0, 1]
         ax          :O[axes.Axes]=None  # Matplotlib axes
         ) -> RGBProxy:
 
     args = locals()
     del args["x"]
-    
+
     return RGBProxy(x)(**args)

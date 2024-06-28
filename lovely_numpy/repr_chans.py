@@ -33,7 +33,7 @@ def fig_chans(  x           :np.ndarray,      # Input array
     """
     Process individual channels of a ndarray that can be interpreted as as image
     """
-    
+
     assert x.ndim >= 2, f"Expected a 2+ dim input, got {x.shape}={x.ndim}"
     if x.ndim == 2:
         x = x[None] # Add a channel dim in front.
@@ -51,10 +51,10 @@ def fig_chans(  x           :np.ndarray,      # Input array
 
 
 # %% ../nbs/05_repr_chans.ipynb 5
-class ChanProxy():   
+class ChanProxy():
     def __init__(self, x: np.ndarray):
         self.x = x
-        self.params = dict( cmap        ="twilight", 
+        self.params = dict( cmap        ="twilight",
                             cm_below    ="blue",
                             cm_above    ="red",
                             cm_ninf     ="cyan",
@@ -68,7 +68,7 @@ class ChanProxy():
                             ax          =None)
 
     def __call__(self,
-                 cmap       :O[str] =None, 
+                 cmap       :O[str] =None,
                  cm_below   :O[str] =None,
                  cm_above   :O[str] =None,
                  cm_ninf    :O[str] =None,
@@ -80,7 +80,7 @@ class ChanProxy():
                  scale      :O[int] =None,
                  cl         :Any    =None,
                  ax         :O[axes.Axes]=None):
-        
+
         self.params.update( {   k:v for
                                 k,v in locals().items()
                                 if k != "self" and v is not None } )

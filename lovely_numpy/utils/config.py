@@ -10,6 +10,8 @@ from typing import Callable, Union, Optional, TypeVar
 from contextlib import contextmanager
 
 import numpy as np
+import warnings
+
 
 # %% ../../nbs/03d_utils.config.ipynb 5
 class Config(SimpleNamespace):
@@ -23,8 +25,6 @@ class Config(SimpleNamespace):
             indent        = 2,    # Indent for .deeper()
             color         = True, # ANSI colors in text
             deeper_width  =9,     # For .deeper, width per level
-            repr          = None, # Use func e.g. `lovely` for `repr(np.ndarray)`
-            str           = None, # Use func e.g. `lovely` for `str(np.ndarray)`
             plt_seed      = 42,   # Sampling seed for `plot`
             fig_close     = True, # Close matplotlib Figure
             fig_show      = False,# Call `plt.show()` for `.plt`, `.chans` and `.rgb`
@@ -63,18 +63,9 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
     for k,v in args.items():
         if v != D:
             
-            # set_config(repr=func)             -> Set both `repr` and `str`.
-            # set_config(repr=func, str=None)   -> Set `repr`, unset `str``
-            # set_config(str=func)              -> Set `str`` only, don't tuch `repr``
-            # set_config(repr=None)             -> Unset `repr`and `str``
-            # set_config(str=None)              -> Unset `str` only
-
-            if k == "repr":
-                np.set_string_function(v, True)
-                if args["str"] == D:
-                    np.set_string_function(v, False)
-            if k == "str":
-                np.set_string_function(v, False)
+            if k in ["repr", "str"]:
+                warnings.warn("The use of 'repr' and 'str' as configuration options is deprecated, because Numpy 2.0 makes it hard to set them.", DeprecationWarning)
+                continue
 
             if v is None:
                 setattr(_config, k, getattr(_defaults, k))
@@ -105,7 +96,6 @@ def config( precision       :Optional[Union[Default,int]]     =D,
     "Context manager for temporarily setting config options"
     new_opts = { k:v for k, v in locals().items() if v != D}
     old_opts = copy(get_config().__dict__)
-
 
     try:
         set_config(**new_opts)

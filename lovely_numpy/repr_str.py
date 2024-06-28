@@ -31,11 +31,6 @@ def short_dtype(x: Union[np.ndarray, np.generic]):
     return dtnames.get(x.dtype.name, str(x.dtype))
 
 # %% ../nbs/00_repr_str.ipynb 9
-def plain_repr(x):
-    with config(repr=None):
-        return repr(x)
-
-# %% ../nbs/00_repr_str.ipynb 10
 def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore
             plain   :bool   =False,                 # Plain old way
             verbose :bool   =False,                 # Both summaty and plain
@@ -47,7 +42,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     "Pretty-print the stats of a numpy array or scalar"
 
     if plain or not isinstance(x, (np.ndarray, np.generic)) or np.iscomplexobj(x) or not np.issubdtype(x.dtype, np.number):
-        return plain_repr(x)
+        return repr(x)
 
     conf = get_config()
 
@@ -77,7 +72,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     res = sparse_join([type_str, dtype, numel, common, vals])
 
     if verbose:
-        res += "\n" + plain_repr(x)
+        res += "\n" + repr(x)
 
     if depth and x.ndim > 1:
         deep_width = min(x.shape[0], conf.deeper_width) # Print at most this many lines

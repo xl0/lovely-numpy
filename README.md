@@ -28,7 +28,7 @@
 
 ##### Community
 
-- [Discord](https://discord.gg/qBaqauUWXP) (Now the link works!)
+- [Discord](https://discord.gg/qBaqauUWXP)
 
 ## Install
 
@@ -180,7 +180,7 @@ lo(numbers).rgb
 *Maaaaybe?* Looks like someone normalized him.
 
 ``` python
-in_stats = ( (0.485, 0.456, 0.406),     # mean 
+in_stats = ( (0.485, 0.456, 0.406),     # mean
              (0.229, 0.224, 0.225) )    # std
 
 # numbers.rgb(in_stats, cl=True) # For channel-last input format
@@ -219,7 +219,7 @@ eight_images = (eight_images
                      *np.array(in_stats[1])
                      +np.array(in_stats[0])
                 ).clip(0,1).reshape(2,2,2,196,196,3)
-            
+
 lo(eight_images)
 ```
 
@@ -282,23 +282,6 @@ print(lo(np.array([1,2,3])))
     array[3] i64 x∈[1, 3] μ=2.000e+00 σ=8.165e-01 [1, 2, 3]
     array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
 
-## Default `str` and `repr`
-
-``` python
-set_config(repr=lovely)
-print(np.array([1, 2, 3])) # Note: print() calls str(). Cell output is repr()
-print(repr(np.array([1, 2, 3]))) # See docs if you want to only set `repr`` or `str``
-```
-
-    array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
-    array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]
-
-``` python
-lo(np.array([1, 2, 3])).p # To see the plain values
-```
-
-    array([1, 2, 3])
-
 ## Without <code>Lo</code>
 
 ``` python
@@ -316,19 +299,19 @@ lovely(numbers) # Returns `str`, that's why you see ''.
 rgb(numbers, denorm=in_stats)
 ```
 
-![](index_files/figure-commonmark/cell-28-output-1.png)
+![](index_files/figure-commonmark/cell-26-output-1.png)
 
 ``` python
 chans(numbers*0.3+0.5)
 ```
 
-![](index_files/figure-commonmark/cell-29-output-1.png)
+![](index_files/figure-commonmark/cell-27-output-1.png)
 
 ``` python
 plot(numbers)
 ```
 
-![](index_files/figure-commonmark/cell-30-output-1.svg)
+![](index_files/figure-commonmark/cell-28-output-1.svg)
 
 ## Matplotlib integration \| [Docs](matplotlib.html)
 
@@ -336,7 +319,7 @@ plot(numbers)
 lo(numbers).rgb(in_stats).fig # matplotlib figure
 ```
 
-![](index_files/figure-commonmark/cell-31-output-1.png)
+![](index_files/figure-commonmark/cell-29-output-1.png)
 
 ``` python
 lo(numbers).plt.fig.savefig('pretty.svg') # Save it
@@ -364,4 +347,4 @@ lo(numbers_01).rgb(ax=ax2)
 lo(numbers_01).chans(ax=ax3);
 ```
 
-![](index_files/figure-commonmark/cell-34-output-1.png)
+![](index_files/figure-commonmark/cell-32-output-1.png)

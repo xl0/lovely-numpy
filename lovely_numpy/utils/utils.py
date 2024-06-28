@@ -34,7 +34,7 @@ def pretty_str(x):
             return "0."
 
         sci = sci_mode(x) if get_config().sci_mode is None else get_config().sci_mode
-        
+
         fmt = f"{{:.{get_config().precision}{'e' if sci else 'f'}}}"
 
         return fmt.format(x)
@@ -56,7 +56,7 @@ def ansi_color(s: str, col: str, use_color=True):
         style["grey"] = "\x1b[38;2;127;127;127m"
         style["red"] = "\x1b[31m"
         end_style = "\x1b[0m"
-       
+
         return style[col]+s+end_style if use_color else s
 
 # %% ../../nbs/03_utils.utils.ipynb 18
@@ -78,7 +78,7 @@ def bytes_to_human(num_bytes):
 def np_to_str_common(x: Union[np.ndarray, np.generic],  # Input
                         color=True,                     # ANSI color highlighting
                         ddof=0):                        # For "std" unbiasing
-                        
+
     if x.size == 0:
         return ansi_color("empty", "grey", color)
 
@@ -134,6 +134,6 @@ else:
 # %% ../../nbs/03_utils.utils.ipynb 29
 def in_debugger():
     """Returns True if a debugger was used.
-    
+
     Note: This funciton will keep returning True even after you exit the debugger."""
     return getattr(sys, "gettrace", None) and sys.gettrace() is not None
