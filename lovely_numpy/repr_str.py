@@ -41,7 +41,11 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
 
     "Pretty-print the stats of a numpy array or scalar"
 
-    if plain or not isinstance(x, (np.ndarray, np.generic)) or np.iscomplexobj(x) or not np.issubdtype(x.dtype, np.number):
+    if (plain or
+        not isinstance(x, (np.ndarray, np.generic)) or
+        np.iscomplexobj(x) or
+            ( not np.issubdtype(x.dtype, np.number) and not np.issubdtype(x.dtype, np.bool_) )
+        ):
         return repr(x)
 
     conf = get_config()
