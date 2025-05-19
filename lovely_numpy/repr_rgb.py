@@ -62,12 +62,12 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
 
     if ax is None:
         fig = plt.figure(frameon=False, figsize=(x.shape[1] * 0.01, x.shape[0]*0.01) )
-        if close: plt.close(fig)
         fig.set_dpi(100)
 
         ax = fig.add_axes([0,0,1,1])
         ax.set_axis_off()
         ax.set_xlim(0, x.shape[1]+1)
+        if close: plt.close(fig)
 
     ax.imshow(x, interpolation="none")
     if show: plt.show()

@@ -27,9 +27,6 @@ def normal_pdf( x   :np.ndarray,
         = \dfrac{e^{- \frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^{2}}}
             {\sigma \sqrt{2\pi}}$$"""
 
-    np.e
-    # dev = x.device
-    
     mean = np.array(mean) #if not isinstance(mean, torch.Tensor) else mean
     std = np.array(std) #.to(dev) if not isinstance(std, torch.Tensor) else std
 
@@ -46,14 +43,14 @@ def sample( x       :np.ndarray,
     #   - samples from x
     #   - original x min (None = no good numbes in x)
     #   - original x max (None = no good numbes in x)
-    
+
     # Ignore NaN and Inf.
     x = x[ np.isfinite(x) ]
     x_min = x_max = None
 
-    if x.size: 
+    if x.size:
         x_min, x_max = x.min(), x.max()
-        
+
         # An option to ignore zeros
         if not plt0: x = x[x != 0.]
 
@@ -61,7 +58,7 @@ def sample( x       :np.ndarray,
             rng = np.random.default_rng( get_config().plt_seed )
             x = rng.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
 
-    return (x, x_min, x_max)  
+    return (x, x_min, x_max)
 
 # %% ../nbs/02_repr_plt.ipynb 7
 def find_xlims( x_min   :Union[float, None],
@@ -71,7 +68,7 @@ def find_xlims( x_min   :Union[float, None],
                 center  :str):
 
     assert center in ["zero", "mean", "range"]
-    
+
     if x_min is None or x_max is None: return (-1., 1,)
     if x_min == x_max and center == "range": center = "zero"
     if x_mean is None or x_std is None and center == "mean": center = "zero"
@@ -92,9 +89,9 @@ def find_xlims( x_min   :Union[float, None],
         # Center the plot around zero
         abs_max_value = max(abs(x_min), abs(x_max), 1.)
         xlim_min, xlim_max = -abs_max_value, abs_max_value
-    
 
-    # Give some extra space around the 
+
+    # Give some extra space around the data
     xlim_min -= abs(xlim_max - xlim_min) * 0.02
     xlim_max += abs(xlim_max - xlim_min) * 0.02
 
@@ -111,7 +108,7 @@ def plot_histogram( x   :np.ndarray,
         # Adjust the number of bins proportional to the fraction of x axis occupied
         # by the histogram
         xlims = ax.get_xlim()
-        
+
         bins = min(bins, 100)
         bins = np.ceil( bins * ( (x.max()-x.min())/(xlims[1]-xlims[0]) ) ).astype(int)
         bins = max(bins, 10)
@@ -148,7 +145,7 @@ def plot_sigmas(x_min   :Union[float, None],
 
         for s in range(-sigmas, sigmas+1):
             x_pos = (x_mean + s*x_std)
-            if xlims[0] < x_pos < xlims[1]:
+            if xlims[0] < x_pos < xlims[1] and (sigmas <= 20 or not s%10):
                 greek = ["-σ", "μ", "+σ"][s+1]  if -1 <= s <= 1 else f"{s:+}σ"
                 weight='bold' if not s else None
                 ax.axvline(x_pos, 0, 1, c="black")
@@ -196,7 +193,7 @@ def plot_str(t_str, ax):
 
 # %% ../nbs/02_repr_plt.ipynb 13
 @config(show_mem_above=np.inf)
-def fig_plot(   x     :np.ndarray,  # 
+def fig_plot(   x     :np.ndarray,  #
                 center  :str    ="zero",        # Center plot on  `zero`, `mean`, or `range`
                 max_s   :int    =10000,         # Draw up to this many samples. =0 to draw all
                 plt0    :Any    =True,          # Take zero values into account
@@ -210,14 +207,14 @@ def fig_plot(   x     :np.ndarray,  #
     # display backend-specific info.
     if summary is None: summary = str(lovely(x, color=False))
     orig_numel = x.size
-   
+
     x, x_min, x_max = sample(x, max_s, plt0)
     x_mean, x_std = (x.mean(), x.std(ddof=ddof)) if x.size else (None,None)
 
 
     t_str = ""
     if x.size != orig_numel:
-        t_str += str(x.size) 
+        t_str += str(x.size)
         if not plt0: t_str += " non-zero"
         t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
     t_str += summary
@@ -235,7 +232,7 @@ def fig_plot(   x     :np.ndarray,  #
     ax.set_xlim(*xlims)
     plot_histogram(x,  ax)
     plot_pdf(x_mean, x_std, ax)
-    
+
     # Add extra space to make sure the labels clear the histogram
     ylim = ax.get_ylim()
     ax.set_ylim( ylim[0], ylim[1]*1.3 )
@@ -243,7 +240,7 @@ def fig_plot(   x     :np.ndarray,  #
     plot_sigmas(x_min, x_max, x_mean, x_std, ax)
     plot_minmax(x_min, x_max, ax)
     plot_str(t_str, ax)
-    
+
     ax.set_yticks([])
 
     if show: plt.show()
@@ -253,9 +250,9 @@ def fig_plot(   x     :np.ndarray,  #
 
 # %% ../nbs/02_repr_plt.ipynb 14
 # This is here for the monkey-patched tensor use case.
-# Gives the ability to call both .plt and .plt(ax=ax).  
+# Gives the ability to call both .plt and .plt(ax=ax).
 
-class PlotProxy(): 
+class PlotProxy():
     """Flexible `PIL.Image.Image` wrapper"""
 
     def __init__(self, x:np.ndarray):
@@ -276,7 +273,7 @@ class PlotProxy():
         self.params.update( { k:v for
                     k,v in locals().items()
                     if k != "self" and v is not None } )
-        
+
         _ = self.fig # Trigger figure generation
         return self
 
