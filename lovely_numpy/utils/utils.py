@@ -55,6 +55,9 @@ def ansi_color(s: str, col: str, use_color=True):
         style = defaultdict(str)
         style["grey"] = "\x1b[38;2;127;127;127m"
         style["red"] = "\x1b[31m"
+        style["green"] = "\x1b[32m"
+        style["blue"] = "\x1b[34m"
+        style["yellow"] = "\x1b[33m"
         end_style = "\x1b[0m"
 
         return style[col]+s+end_style if use_color else s
