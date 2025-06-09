@@ -12,7 +12,6 @@ from contextlib import contextmanager
 import numpy as np
 import warnings
 
-
 # %% ../../nbs/03d_utils.config.ipynb 5
 class Config(SimpleNamespace):
     "Config"
@@ -24,6 +23,7 @@ class Config(SimpleNamespace):
             show_mem_above= 1024, # Show memory usage in b/Kb/Mb/Gb if it's larger than this
             indent        = 2,    # Indent for .deeper()
             color         = True, # ANSI colors in text
+            verbose       = False,# Show the default repr by default
             deeper_width  =9,     # For .deeper, width per level
             plt_seed      = 42,   # Sampling seed for `plot`
             fig_close     = True, # Close matplotlib Figure
@@ -35,7 +35,7 @@ _defaults = Config()
 _config = copy(_defaults)
 
 # %% ../../nbs/03d_utils.config.ipynb 8
-# Allows passing None as an argument to reset the 
+# Allows passing None as an argument to reset the
 class _Default():
     def __repr__(self):
         return "Ignore"
@@ -50,6 +50,7 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
                 show_mem_above  :Optional[Union[Default,bool]]    =D,
                 indent          :Optional[Union[Default,bool]]    =D,
                 color           :Optional[Union[Default,bool]]    =D,
+                verbose         :Optional[Union[Default,bool]]    =D,
                 deeper_width    :Optional[Union[Default,int]]     =D,
                 repr            :Optional[Union[Default,Callable]]=D,
                 str             :Optional[Union[Default,Callable]]=D,
@@ -62,7 +63,7 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
     args = locals().copy()
     for k,v in args.items():
         if v != D:
-            
+
             if k in ["repr", "str"]:
                 warnings.warn("The use of 'repr' and 'str' as configuration options is deprecated, because Numpy 2.0 makes it hard to set them.", DeprecationWarning)
                 continue
@@ -86,6 +87,7 @@ def config( precision       :Optional[Union[Default,int]]     =D,
             show_mem_above  :Optional[Union[Default,bool]]    =D,
             indent          :Optional[Union[Default,bool]]    =D,
             color           :Optional[Union[Default,bool]]    =D,
+            verbose         :Optional[Union[Default,bool]]    =D,
             deeper_width    :Optional[Union[Default,int]]     =D,
             repr            :Optional[Union[Default,Callable]]=D,
             str             :Optional[Union[Default,Callable]]=D,

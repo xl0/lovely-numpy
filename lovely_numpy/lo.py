@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['Lo', 'lo']
 
-# %% ../nbs/10_lo.ipynb 3
+# %% ../nbs/10_lo.ipynb 4
 from typing import Any, Union, Optional as O
 from matplotlib import pyplot as plt, axes, figure
 
@@ -12,23 +12,24 @@ import numpy as np
 from fastcore.all import store_attr
 
 from .utils import history_warning
+from .utils.config import get_config
 from .repr_str import lovely
 from .repr_plt import PlotProxy
 from .repr_rgb import RGBProxy
 from .repr_chans import ChanProxy
 
-# %% ../nbs/10_lo.ipynb 4
+# %% ../nbs/10_lo.ipynb 5
 class Lo():
     """Lo and behold! What a lovely `numpy.ndarray`!"""
     def __init__(   self,
                     x: Union[np.ndarray, np.generic], # Your data
                     plain       =False, # Show as plain text - values only
-                    verbose     =False, # Verbose - show values too
+                    verbose     =None,  # Verbose - show values too
                     depth       =0,     # Expand up to `depth`
                     color :O[bool] =None): # Use ANSI colors
         self.x      =x
         self.plain  =plain
-        self.verbose=verbose
+        self.verbose= get_config().verbose if verbose is None else verbose
         self.depth  =depth
         self.color  =color
 
@@ -73,10 +74,10 @@ class Lo():
     def __call__(self, depth=1):
         return Lo(self.x, depth=depth, color=self.color)
 
-# %% ../nbs/10_lo.ipynb 5
+# %% ../nbs/10_lo.ipynb 6
 def lo(x: Union[np.ndarray, np.generic],    # Your data
         plain   :bool   =False, # Show as plain text - values only
-        verbose :bool   =False, # Verbose - show values too
+        verbose :bool   =None,  # Verbose - show values too
         depth   :int    =0,     # Expand up to `depth`
         color   :O[bool]=None): # Use ANSI colors
     return Lo(x, plain=plain, verbose=verbose, depth=depth, color=color)
