@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['plot']
 
-# %% ../nbs/02_repr_plt.ipynb 3
+# %% ../nbs/02_repr_plt.ipynb
 import math
 from typing import Union, Tuple, Any, Optional as O
 
@@ -15,7 +15,7 @@ from .repr_str import lovely, pretty_str
 from .utils import get_config, config
 from .utils.utils import cached_property
 
-# %% ../nbs/02_repr_plt.ipynb 4
+# %% ../nbs/02_repr_plt.ipynb
 def normal_pdf( x   :np.ndarray,
                 mean:Union[np.ndarray, float] =0.,
                 std :Union[np.ndarray, float] =1.):
@@ -34,7 +34,7 @@ def normal_pdf( x   :np.ndarray,
                 (std * np.sqrt((np.pi * 2)))
             )
 
-# %% ../nbs/02_repr_plt.ipynb 6
+# %% ../nbs/02_repr_plt.ipynb
 def sample( x       :np.ndarray,
             max_s   :int,
             plt0    :bool):
@@ -60,7 +60,7 @@ def sample( x       :np.ndarray,
 
     return (x, x_min, x_max)
 
-# %% ../nbs/02_repr_plt.ipynb 7
+# %% ../nbs/02_repr_plt.ipynb
 def find_xlims( x_min   :Union[float, None],
                 x_max   :Union[float, None],
                 x_mean  :Union[float, None],
@@ -97,7 +97,7 @@ def find_xlims( x_min   :Union[float, None],
 
     return (xlim_min, xlim_max)
 
-# %% ../nbs/02_repr_plt.ipynb 8
+# %% ../nbs/02_repr_plt.ipynb
 def plot_histogram( x   :np.ndarray,
                     ax  :axes.Axes):
     if x.size:
@@ -115,7 +115,7 @@ def plot_histogram( x   :np.ndarray,
 
         ax.hist(x, bins=bins, color="deepskyblue", align="mid", density=True, zorder=4)
 
-# %% ../nbs/02_repr_plt.ipynb 9
+# %% ../nbs/02_repr_plt.ipynb
 def plot_pdf(   x_mean  :Union[float, None],
                 x_std   :Union[float, None],
                 ax      :axes.Axes):
@@ -129,7 +129,7 @@ def plot_pdf(   x_mean  :Union[float, None],
         ax.plot(xl, normal_pdf(xl, mean=x_mean, std=x_std), zorder=5)
 
 
-# %% ../nbs/02_repr_plt.ipynb 10
+# %% ../nbs/02_repr_plt.ipynb
 def plot_sigmas(x_min   :Union[float, None],
                 x_max   :Union[float, None],
                 x_mean  :Union[float, None],
@@ -152,7 +152,7 @@ def plot_sigmas(x_min   :Union[float, None],
                 ax.text(x_pos, ylims[1]*0.95, greek, ha="center", va="top", bbox=bbox, zorder=5, weight=weight)
 
 
-# %% ../nbs/02_repr_plt.ipynb 11
+# %% ../nbs/02_repr_plt.ipynb
 def plot_minmax(x_min   :Union[float, None],
                 x_max   :Union[float, None],
                 ax      :axes.Axes):
@@ -185,13 +185,13 @@ def plot_minmax(x_min   :Union[float, None],
         ax.axvline(x_max, 0, 1, c="red", zorder=2)
 
 
-# %% ../nbs/02_repr_plt.ipynb 12
+# %% ../nbs/02_repr_plt.ipynb
 def plot_str(t_str, ax):
     xlim = ax.get_xlim()
     ylim = ax.get_ylim()
     ax.text(xlim[0], ylim[1]*1.05, s=t_str)
 
-# %% ../nbs/02_repr_plt.ipynb 13
+# %% ../nbs/02_repr_plt.ipynb
 @config(show_mem_above=np.inf)
 def fig_plot(   x     :np.ndarray,  #
                 center  :str    ="zero",        # Center plot on  `zero`, `mean`, or `range`
@@ -248,7 +248,7 @@ def fig_plot(   x     :np.ndarray,  #
     return ax.figure
 
 
-# %% ../nbs/02_repr_plt.ipynb 14
+# %% ../nbs/02_repr_plt.ipynb
 # This is here for the monkey-patched tensor use case.
 # Gives the ability to call both .plt and .plt(ax=ax).
 
@@ -295,7 +295,7 @@ class PlotProxy():
             svg_repr = print_figure(self.fig, fmt="svg", metadata=metadata)
         return svg_repr
 
-# %% ../nbs/02_repr_plt.ipynb 15
+# %% ../nbs/02_repr_plt.ipynb
 def plot(   x       :np.ndarray,        # Your data
             center  :str    ="zero",    # Center plot on  `zero`, `mean`, or `range`
             max_s   :int    =10000,     # Draw up to this many samples. =0 to draw all

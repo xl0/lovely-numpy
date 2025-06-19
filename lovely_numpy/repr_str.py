@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['lovely']
 
-# %% ../nbs/00_repr_str.ipynb 4
+# %% ../nbs/00_repr_str.ipynb
 from typing import Union, Optional as O
 from collections import defaultdict
 from fastcore.foundation import store_attr
@@ -13,7 +13,7 @@ import numpy as np
 from .utils import pretty_str, sparse_join, np_to_str_common, in_debugger, bytes_to_human
 from .utils.config import get_config, set_config, config
 
-# %% ../nbs/00_repr_str.ipynb 6
+# %% ../nbs/00_repr_str.ipynb
 dtnames =   {   "float16": "f16",
                 "float32": "f32",
                 "float64": "", # Default dtype in numpy
@@ -30,7 +30,7 @@ dtnames =   {   "float16": "f16",
 def short_dtype(x: Union[np.ndarray, np.generic]):
     return dtnames.get(x.dtype.name, str(x.dtype))
 
-# %% ../nbs/00_repr_str.ipynb 9
+# %% ../nbs/00_repr_str.ipynb
 def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore
             plain   :bool   =False,                 # Plain old way
             verbose :bool   =False,                 # Both summaty and plain

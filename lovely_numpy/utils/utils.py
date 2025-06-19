@@ -4,7 +4,7 @@
 __all__ = ['sci_mode', 'pretty_str', 'sparse_join', 'ansi_color', 'bytes_to_human', 'np_to_str_common', 'history_warning',
            'in_debugger']
 
-# %% ../../nbs/03_utils.utils.ipynb 4
+# %% ../../nbs/03_utils.utils.ipynb
 import sys
 from collections import defaultdict
 import warnings
@@ -13,14 +13,14 @@ from typing import Optional, Union
 from .config import get_config
 
 
-# %% ../../nbs/03_utils.utils.ipynb 5
+# %% ../../nbs/03_utils.utils.ipynb
 # Do we want this float in decimal or scientific mode?
 def sci_mode(f: float):
     config = get_config()
     return ((abs(f) < 10**config.threshold_min) or
             (abs(f) > 10**config.threshold_max))
 
-# %% ../../nbs/03_utils.utils.ipynb 8
+# %% ../../nbs/03_utils.utils.ipynb
 # Convert an ndarray or scalar into a string.
 # This only looks good for small arrays, which is how it's intended to be used.
 def pretty_str(x):
@@ -44,12 +44,12 @@ def pretty_str(x):
         slices = [pretty_str(x[i]) for i in range(0, x.shape[0])]
         return '[' + ", ".join(slices) + ']'
 
-# %% ../../nbs/03_utils.utils.ipynb 13
+# %% ../../nbs/03_utils.utils.ipynb
 def sparse_join(lst, sep=" "):
     # Join non-empty list elements into a space-sepaeated string
     return sep.join( [ l for l in lst if l] )
 
-# %% ../../nbs/03_utils.utils.ipynb 15
+# %% ../../nbs/03_utils.utils.ipynb
 def ansi_color(s: str, col: str, use_color=True):
         "Very minimal ANSI color support"
         style = defaultdict(str)
@@ -62,7 +62,7 @@ def ansi_color(s: str, col: str, use_color=True):
 
         return style[col]+s+end_style if use_color else s
 
-# %% ../../nbs/03_utils.utils.ipynb 18
+# %% ../../nbs/03_utils.utils.ipynb
 def bytes_to_human(num_bytes):
     units = ['b', 'Kb', 'Mb', 'Gb']
 
@@ -77,7 +77,7 @@ def bytes_to_human(num_bytes):
     else:
         return f"{value:.1f}{unit}"
 
-# %% ../../nbs/03_utils.utils.ipynb 20
+# %% ../../nbs/03_utils.utils.ipynb
 def np_to_str_common(x: Union[np.ndarray, np.generic],  # Input
                         color=True,                     # ANSI color highlighting
                         ddof=0):                        # For "std" unbiasing
@@ -103,13 +103,13 @@ def np_to_str_common(x: Union[np.ndarray, np.generic],  # Input
 
     return sparse_join([ summary, attention])
 
-# %% ../../nbs/03_utils.utils.ipynb 24
+# %% ../../nbs/03_utils.utils.ipynb
 def history_warning():
     "Issue a warning (once) ifw e are running in IPYthon with output cache enabled"
     if "get_ipython" in globals() and get_ipython().cache_size > 0:
         warnings.warn("IPYthon has its output cache enabled. See https://xl0.github.io/lovely-tensors/history.html")
 
-# %% ../../nbs/03_utils.utils.ipynb 26
+# %% ../../nbs/03_utils.utils.ipynb
 # functools.cached_property is not available in python < 3.8
 
 assert sys.version_info.major == 3 # Python 4 some day?
@@ -134,7 +134,7 @@ else:
     from functools import cached_property
 
 
-# %% ../../nbs/03_utils.utils.ipynb 29
+# %% ../../nbs/03_utils.utils.ipynb
 def in_debugger():
     """Returns True if a debugger was used.
 

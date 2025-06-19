@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['rgb']
 
-# %% ../nbs/01_repr_rgb.ipynb 3
+# %% ../nbs/01_repr_rgb.ipynb
 from typing import Union, Any, Optional as O
 
 import numpy as np
@@ -15,7 +15,7 @@ from .utils.tile2d import hypertile
 from .utils.utils import cached_property
 from .utils import get_config
 
-# %% ../nbs/01_repr_rgb.ipynb 4
+# %% ../nbs/01_repr_rgb.ipynb
 def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
             denorm      :Any    =None,      # Reverse per-channel normalizatoin
             cl          :Any    =True,      # Channel-last format
@@ -74,7 +74,7 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
 
     return ax.figure
 
-# %% ../nbs/01_repr_rgb.ipynb 6
+# %% ../nbs/01_repr_rgb.ipynb
 class RGBProxy():
     """Flexible `PIL.Image.Image` wrapper"""
 
@@ -114,7 +114,7 @@ class RGBProxy():
         return print_figure(self.fig, fmt="png", pad_inches=0,
             metadata={"Software": "Matplotlib, https://matplotlib.org/"})
 
-# %% ../nbs/01_repr_rgb.ipynb 7
+# %% ../nbs/01_repr_rgb.ipynb
 def rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
         denorm      :Any    =None,      # Reverse per-channel normalizatoin
         cl          :Any    =True,      # Channel-last

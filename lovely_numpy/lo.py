@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['Lo', 'lo']
 
-# %% ../nbs/10_lo.ipynb 4
+# %% ../nbs/10_lo.ipynb
 from typing import Any, Union, Optional as O
 from matplotlib import pyplot as plt, axes, figure
 
@@ -18,7 +18,7 @@ from .repr_plt import PlotProxy
 from .repr_rgb import RGBProxy
 from .repr_chans import ChanProxy
 
-# %% ../nbs/10_lo.ipynb 5
+# %% ../nbs/10_lo.ipynb
 class Lo():
     """Lo and behold! What a lovely `numpy.ndarray`!"""
     def __init__(   self,
@@ -74,7 +74,7 @@ class Lo():
     def __call__(self, depth=1):
         return Lo(self.x, depth=depth, color=self.color)
 
-# %% ../nbs/10_lo.ipynb 6
+# %% ../nbs/10_lo.ipynb
 def lo(x: Union[np.ndarray, np.generic],    # Your data
         plain   :bool   =False, # Show as plain text - values only
         verbose :bool   =None,  # Verbose - show values too

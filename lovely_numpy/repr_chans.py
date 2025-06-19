@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['chans']
 
-# %% ../nbs/05_repr_chans.ipynb 3
+# %% ../nbs/05_repr_chans.ipynb
 from typing import Any, Optional as O
 
 import numpy as np
@@ -15,7 +15,7 @@ from .utils.colormap import InfCmap, get_cmap
 from .utils.config import config, get_config
 from .utils.utils import cached_property
 
-# %% ../nbs/05_repr_chans.ipynb 4
+# %% ../nbs/05_repr_chans.ipynb
 def fig_chans(  x           :np.ndarray,      # Input array
                 cmap        :str="twilight",  # Use matplotlib colormap by this name
                 cm_below    :str="blue",
@@ -50,7 +50,7 @@ def fig_chans(  x           :np.ndarray,      # Input array
     return fig_rgb(inf_cmap(x), cl=True, gutter_px=gutter_px, frame_px=frame_px, scale=scale, view_width=view_width, ax=ax)
 
 
-# %% ../nbs/05_repr_chans.ipynb 5
+# %% ../nbs/05_repr_chans.ipynb
 class ChanProxy():
     def __init__(self, x: np.ndarray):
         self.x = x
@@ -96,7 +96,7 @@ class ChanProxy():
             metadata={"Software": "Matplotlib, https://matplotlib.org/"})
 
 
-# %% ../nbs/05_repr_chans.ipynb 6
+# %% ../nbs/05_repr_chans.ipynb
 def chans(  x           :np.ndarray,      # Input array
             cmap        :str="twilight",  # Use matplotlib colormap by this name
             cm_below    :str="blue",

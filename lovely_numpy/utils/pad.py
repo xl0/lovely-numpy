@@ -3,10 +3,10 @@
 # %% auto 0
 __all__ = ['pad_frame', 'pad_frame_gutters']
 
-# %% ../../nbs/03b_utils.pad.ipynb 4
+# %% ../../nbs/03b_utils.pad.ipynb
 import numpy as np
 
-# %% ../../nbs/03b_utils.pad.ipynb 6
+# %% ../../nbs/03b_utils.pad.ipynb
 def pad_frame(t: np.ndarray, # torch.Tensor,  # 3D+ image tensor, [...,H,W,C]
               frame_px: int=1,       # Number of pixels to pad each side.
               val :float=0):           # Value to pad with.
@@ -19,7 +19,7 @@ def pad_frame(t: np.ndarray, # torch.Tensor,  # 3D+ image tensor, [...,H,W,C]
                   constant_values=val)
 
 
-# %% ../../nbs/03b_utils.pad.ipynb 10
+# %% ../../nbs/03b_utils.pad.ipynb
 def pad_frame_gutters(t: np.ndarray,  # 3D+ Tensor image tensor, [...,H,W,C]
                       gutter_px=3,      # Write gutter in pixels.
                       frame_px=1):      # Black frame, in pixels

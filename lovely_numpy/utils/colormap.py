@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['InfCmap']
 
-# %% ../../nbs/03a_utils.colormap.ipynb 3
+# %% ../../nbs/03a_utils.colormap.ipynb
 from typing import Optional as  O
 import numpy as np
 import matplotlib as mpl, matplotlib.cm as cm
@@ -11,7 +11,7 @@ from matplotlib.colors import Colormap, to_rgba
 
 from ..repr_rgb import rgb
 
-# %% ../../nbs/03a_utils.colormap.ipynb 5
+# %% ../../nbs/03a_utils.colormap.ipynb
 def get_cmap(cmap: str) -> Colormap:
     # Matplotlib changed the colormap interface in version 3.6, and immediately
     # marked the old one as deprecated with a warning. I want to suppot
@@ -25,7 +25,7 @@ def get_cmap(cmap: str) -> Colormap:
         return mpl.colormaps[cmap]
 
 
-# %% ../../nbs/03a_utils.colormap.ipynb 21
+# %% ../../nbs/03a_utils.colormap.ipynb
 class InfCmap():
     """
     Matplotlib colormap extended to have colors for +/-inf

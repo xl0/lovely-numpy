@@ -16,12 +16,6 @@
 - [TinyGrad](https://github.com/tinygrad/tinygrad): 🫀 [Lovely
   Grad](https://github.com/xl0/lovely-grad)
 
-##### Proompting
-
-- Log prompts with 💌 [Lovely
-  Prompts](https://github.com/xl0/lovely-prompts)
-- Better LangChain: 😎 [Proompter](https://github.com/xl0/proompter)
-
 ##### Community
 
 - [Discord](https://discord.gg/qBaqauUWXP)
