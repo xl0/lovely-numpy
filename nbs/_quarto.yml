@@ -25,5 +25,6 @@ website:
         href: "https://sigmoid.social/@xl0"
   sidebar:
     style: floating
-
+    
+default-image-extension: ""
 metadata-files: [nbdev.yml, sidebar.yml]
