@@ -27,7 +27,7 @@ def pad_frame_gutters(t: np.ndarray,  # 3D+ Tensor image tensor, [...,H,W,C]
     assert t.ndim >= 3
     xy_shape = t.shape[-2:]
     # gutter_px = ceil(max(xy_shape)*gutter_frac//2)
-    
+
     # XXX This does not work for RGBA images, as the alpha channel is set to 0!
     t = pad_frame(t, frame_px=frame_px, val=0) # Black frame
     return pad_frame(t, frame_px=gutter_px, val=1) # White gutters between images

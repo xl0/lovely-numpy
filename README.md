@@ -67,7 +67,7 @@ numbers
             [-0.8164, -0.285 , -1.5256],
             ...,
             [-1.5528, -1.2829, -1.5256],
-            [ 2.1119,  2.341 ,  2.3611]]], dtype=float32)
+            [ 2.1119,  2.341 ,  2.3611]]], shape=(196, 196, 3), dtype=float32)
 
 Was it really useful for you, as a human, to see all these numbers?
 
@@ -124,7 +124,7 @@ lo(spicy, verbose=True)
     array[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!
     array([[-3540.5432,    -0.    , ...,        nan,    -0.4054],
            [   -0.4226,    -0.4911, ...,    -0.5424,    -0.5082]],
-          dtype=float32)
+          shape=(2, 6), dtype=float32)
 
 ## Going `.deeper`
 
