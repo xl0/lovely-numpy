@@ -4,13 +4,10 @@
 __all__ = ['rgb']
 
 # %% ../nbs/01_repr_rgb.ipynb
-from typing import Union, Any, Optional as O
+from typing import Any, Optional as O
 
 import numpy as np
-from matplotlib import pyplot as plt, axes, figure, rcParams
-from IPython.core.pylabtools import print_figure
-
-
+from matplotlib import pyplot as plt, axes, figure
 from .utils.tile2d import hypertile
 from .utils.utils import cached_property
 from .utils import get_config
@@ -110,6 +107,7 @@ class RGBProxy():
         return fig_rgb(self.x, **self.params)
 
     def _repr_png_(self):
+        from IPython.core.pylabtools import print_figure
         return print_figure(self.fig, fmt="png", pad_inches=0,
             metadata={"Software": "Matplotlib, https://matplotlib.org/"})
 

@@ -8,7 +8,6 @@ from typing import Any, Optional as O
 
 import numpy as np
 from matplotlib import axes, figure, pyplot as plt
-from IPython.core.pylabtools import print_figure
 
 from .repr_rgb import fig_rgb, rgb
 from .utils.colormap import InfCmap, get_cmap
@@ -92,6 +91,7 @@ class ChanProxy():
         return fig_chans(self.x, **self.params)
 
     def _repr_png_(self):
+        from IPython.core.pylabtools import print_figure
         return print_figure(self.fig, fmt="png", pad_inches=0,
             metadata={"Software": "Matplotlib, https://matplotlib.org/"})
 

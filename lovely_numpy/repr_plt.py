@@ -9,7 +9,6 @@ from typing import Union, Tuple, Any, Optional as O
 
 import numpy as np
 from matplotlib import pyplot as plt, axes, figure, rc_context
-from IPython.core.pylabtools import print_figure
 
 from .repr_str import lovely, pretty_str
 from .utils import get_config, config
@@ -282,6 +281,7 @@ class PlotProxy():
         return fig_plot( self.x, **self.params)
 
     def _repr_png_(self):
+        from IPython.core.pylabtools import print_figure
         return print_figure(self.fig, fmt="png",
             metadata={"Software": "Matplotlib, https://matplotlib.org/"})
 
@@ -291,6 +291,7 @@ class PlotProxy():
             "Date": None,
             "Creator": "Matplotlib, https://matplotlib.org/",
         }
+        from IPython.core.pylabtools import print_figure
         with rc_context({"svg.hashsalt": "1"}):
             svg_repr = print_figure(self.fig, fmt="svg", metadata=metadata)
         return svg_repr
