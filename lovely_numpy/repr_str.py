@@ -81,7 +81,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     if depth and x.ndim > 1:
         deep_width = min(x.shape[0], conf.deeper_width) # Print at most this many lines
         with config(show_mem_above=np.inf):
-            deep_lines = [ " "*conf.indent*(lvl+1) + lovely(x[i,:], depth=depth-1, lvl=lvl+1)
+            deep_lines = [ " "*conf.indent*(lvl+1) + lovely(x[i,:], depth=depth-1, lvl=lvl+1, color=color)
                                 for i in range(deep_width)]
 
             # If we were limited by width, print ...
