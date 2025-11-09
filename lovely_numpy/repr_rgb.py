@@ -13,20 +13,23 @@ from .utils.utils import cached_property
 from .utils import get_config
 
 # %% ../nbs/01_repr_rgb.ipynb
+IMAGENET_MEANS = np.array((0.485, 0.456, 0.406))
+IMAGENET_STDS = np.array((0.229, 0.224, 0.225))
+
 def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
-            denorm      :Any    =None,      # Reverse per-channel normalizatoin
+            denorm      :Any    =None,      # Reverse per-channel normalization
             cl          :Any    =True,      # Channel-last format
             gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
             frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
-            scale       :int    =1,         # Stretch the image. Only itegers please.
+            scale       :int    =1,         # Stretch the image. Only integers please.
             view_width  :int    =966,       # target width of the image
-            clip        :bool   =True,      # Selently clip RGB values to [0, 1] for float, and [0, 255] for uint
+            clip        :bool   =True,      # Silently clip RGB values to [0, 1] for float, and [0, 255] for uint
             ax          :O[axes.Axes]=None  # Matplotlib axes
         ) -> figure.Figure:
 
     assert x.ndim >= 3, f"Expecting 3 or more dimension input, got shape=({x.shape})"
     assert x.size > 0, f"Expecting non-empty input, got shape=({x.shape})"
-    # swap channels if it's not channe-last already
+    # swap channels if it's not channel-last already
     if not cl:
         x = np.swapaxes(np.swapaxes(x, -3, -1), -3, -2)
 
@@ -36,9 +39,27 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
     n_ch = x.shape[-1]
     assert n_ch in (3, 4), f"Expecting 3 (RGB) or 4 (RGBA) color channels, got {n_ch}, shape=({x.shape})"
     if denorm:
-        means = np.array(denorm[0])
-        stds = np.array(denorm[1])
-        x = x * stds + means
+        if isinstance(denorm, str):
+            denorm_lower = denorm.lower()
+            if denorm_lower == 'imagenet':
+                x = x * IMAGENET_STDS + IMAGENET_MEANS
+            elif denorm_lower == 'symmetric':  # For data that was symmetrically normalized to [-1, 1]
+                x = x * 0.5 + 0.5
+            elif denorm_lower == 'minmax':  # Maps the actual data range to [0, 1] with use of a small eps (1e-8) for avoiding division by zero
+                eps = 1e-8
+                finite = np.isfinite(x)
+                if np.any(finite):
+                    x_valid = np.where(finite, x, np.nan)
+                    reduce_axes = tuple(range(x.ndim - 1))
+                    x_min = np.nanmin(x_valid, axis=reduce_axes, keepdims=True)
+                    x_max = np.nanmax(x_valid, axis=reduce_axes, keepdims=True)
+                    x = 0.5 + (x - 0.5 * (x_max + x_min)) / ((x_max - x_min) + eps)
+            else:
+                raise AssertionError(f"Unsupported denormalization string specification: {denorm}")
+        else:
+            means = np.array(denorm[0])
+            stds = np.array(denorm[1])
+            x = x * stds + means
 
     if x.ndim > 3:
         x = hypertile(  t=x,
@@ -113,13 +134,13 @@ class RGBProxy():
 
 # %% ../nbs/01_repr_rgb.ipynb
 def rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] or [[...], H,W,C]
-        denorm      :Any    =None,      # Reverse per-channel normalizatoin
+        denorm      :Any    =None,      # Reverse per-channel normalization
         cl          :Any    =True,      # Channel-last
         gutter_px   :int    =3,         # If more than one tensor -> tile with this gutter width
         frame_px    :int    =1,         # If more than one tensor -> tile with this frame width
-        scale       :int    =1,         # Stretch the image. Only itegers please.
+        scale       :int    =1,         # Stretch the image. Only integers please.
         view_width  :int    =966,       # target width of the image
-        clip        :bool   =True,      # Selently clip RGB values to [0, 1]
+        clip        :bool   =True,      # Silently clip RGB values to [0, 1]
         ax          :O[axes.Axes]=None  # Matplotlib axes
         ) -> RGBProxy:
 

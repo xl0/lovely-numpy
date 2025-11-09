@@ -288,7 +288,7 @@ lovely(numbers) # Returns `str`, that's why you see ''.
     'array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
 
 ``` python
-rgb(numbers, denorm=in_stats)
+rgb(numbers, denorm=in_stats) # OR: denorm='imagenet'
 ```
 
 ![](index_files/figure-commonmark/cell-26-output-1.png)
