@@ -1,0 +1,251 @@
+[
+  {
+    "objectID": "matplotlib.html",
+    "href": "matplotlib.html",
+    "title": "🎭 Matplotlib integration",
+    "section": "",
+    "text": ".fig\n.rgb, .chans and .plt all have a .fig attribute that returns a matplotlib figure object.\n\na = lo(numbers).rgb.fig # matplotlib figure\nprint(type(a))\na\n\n&lt;class 'matplotlib.figure.Figure'&gt;\n\n\n\n\n\n\n\n\n\n\nlo(numbers).chans.fig\n\n\n\n\n\n\n\n\n\nlo(numbers).plt.fig\n\n\n\n\n\n\n\n\n\nlo(numbers).plt(center=\"mean\").fig\n\n\n\n\n\n\n\n\n\n\nSaving the figure\nYou can save the figure by calling its savefig method:\n\nlo(numbers).rgb.fig.savefig(\"tench.jpg\")\n\n\n!file tench.jpg; rm tench.jpg\n\ntench.jpg: JPEG image data, JFIF standard 1.01, resolution (DPI), density 100x100, segment length 16, baseline, precision 8, 196x196, components 3\n\n\n\n\nUsing existing Axes\nAll functions allow an ax= argument that accepts an existing Axes object into which they will plot:\n\nfig = plt.figure(figsize=(8,3))\nfig.set_constrained_layout(True)\ngs = fig.add_gridspec(2,2)\nax1 = fig.add_subplot(gs[0, :])\nax2 = fig.add_subplot(gs[1, 0])\nax3 = fig.add_subplot(gs[1,1:])\n\nax2.set_axis_off()\nax3.set_axis_off()\n\nlo(numbers).plt(ax=ax1)\nlo(numbers).rgb(ax=ax2)\nlo(numbers).chans(ax=ax3);\n\n\n\n\n\n\n\n\n\n\nWithout Jupyter\nBy default, the Lovely functions will call plt.close(fig) on the figures they create.\nThis prevents displaying the figures twice when running in Jupyter.\nIf you are not using Jupyter, here are 2 configuration options you might want to set:\nfig_close=False\n#!/usr/bin/env python\nfrom lovely_numpy import config, set_config, lo\n\n...\n\nset_config(fig_close=False)\nlo(numbers).chans()\n\n# or, using the context manager:\nwith config(fig_close=False):\n    lo(numbers).chans()\n\nplt.show() # Will show all open figures\nfig_show=True\nIf set, lovely will call plt.show() after each figure creation.\nYou don’t need to set fig_close=False manually.\nset_config(fig_show=True)\n\nlo(numbers).chans() # Figure generated and shown\n\n# Note, you have to use the \"call\" syntax `( )`, as figure\n# generation is not triggerd by just accessing the attribute\n\nlo(numbers).chans  # No figure generated\n\nf = lo(numbers).plt.fig # figure generated, shown, and returned.\nNote, plt.show() closes all figures.",
+    "crumbs": [
+      "✨ Misc",
+      "🎭 Matplotlib integration"
+    ]
+  },
+  {
+    "objectID": "repr_chans.html",
+    "href": "repr_chans.html",
+    "title": "📺 View channels",
+    "section": "",
+    "text": "source\n\nchans\n\n chans (x:numpy.ndarray, cmap:str='twilight', cm_below:str='blue',\n        cm_above:str='red', cm_ninf:str='cyan', cm_pinf:str='fuchsia',\n        cm_nan:str='yellow', gutter_px:int=3, frame_px:int=1, scale:int=1,\n        cl:Any=True, view_width:int=966,\n        ax:Optional[matplotlib.axes._axes.Axes]=None)\n\nMap x values to colors. RGB[A] color is added as channel-last\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nndarray\n\nInput array\n\n\ncmap\nstr\ntwilight\nUse matplotlib colormap by this name\n\n\ncm_below\nstr\nblue\n\n\n\ncm_above\nstr\nred\n\n\n\ncm_ninf\nstr\ncyan\n\n\n\ncm_pinf\nstr\nfuchsia\n\n\n\ncm_nan\nstr\nyellow\n\n\n\ngutter_px\nint\n3\nDraw write gutters when tiling the images\n\n\nframe_px\nint\n1\nDraw black frame around each image\n\n\nscale\nint\n1\nStretch the image. Only itegers please.\n\n\ncl\nAny\nTrue\n\n\n\nview_width\nint\n966\n\n\n\nax\nOptional\nNone\n\n\n\nReturns\nChanProxy\n\n\n\n\n\n\nin_stats = ( (0.485, 0.456, 0.406), (0.229, 0.224, 0.225) )\n\nimage = np.load(\"mysteryman.npy\").transpose(1,2,0)\nimage = ((image * np.array(in_stats[1])) + np.array(in_stats[0])).clip(0, 1)\n\nprint(lo(image))\nrgb(image)\n\narray[196, 196, 3] n=115248 (0.9Mb) x∈[0., 1.000] μ=0.361 σ=0.248\n\n\n\n\n\n\n\n\n\n\ndisplay(chans(image)) # 3d array is tiled\ndisplay(chans(image[:,:,0])) # Works with 2d arrays too\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# In R\nimage[0:32, 32:64,  0] = -1.1 # Below min\nimage[0:32, 96:128, 0] = 1.1 # Above max\n# In G\nimage[0:32, 64:96,  1] = float(\"nan\")\n\n# In B\nimage[0:32, 0:32,   2] = float(\"-inf\")\nimage[0:32, 128:160,2] = float(\"+inf\")\n\nimage[0:32, 160:176,1] = 0.\nimage[0:32, 176:   ,1] = 1.\n\nchans(image, cmap=\"bwr\", cm_below=\"black\", cm_above=\"white\")\n\n\n\n\n\n\n\n\n\nlo(np.stack([image]*4))\n\n\narray[4, 196, 196, 3] n=460992 (3.5Mb) x∈[-1.100, 1.100] μ=0.360 σ=0.298 +Inf! -Inf! NaN!\n\n\n\n\n# 4 images, stacked 2x2\nchans(np.stack([image]*4).reshape((2,2,196,196,3)))\n\n\n\n\n\n\n\n\n\none_chan = image[:,:,0] # 1-channel image\nchans(one_chan)\n\n\n\n\n\n\n\n\n\ntry:\n    chans(np.array([]).reshape(0,0,0))\nexcept AssertionError as e:\n    test_eq(e.args[0], \"Expecting non-empty input, got shape=((0, 0, 0, 3))\")\nelse:\n    raise AssertionError(\"Expected AssertionError, but got nothing\")",
+    "crumbs": [
+      "🔎 Array Representations",
+      "📺 View channels"
+    ]
+  },
+  {
+    "objectID": "repr_str.html",
+    "href": "repr_str.html",
+    "title": "🧾 View as a summary",
+    "section": "",
+    "text": "source\n\n\n\n lovely (x:Union[numpy.ndarray,numpy.generic], plain:bool=False,\n         verbose:bool=False, depth:int=0, lvl:int=0,\n         color:Optional[bool]=None)\n\nPretty-print the stats of a numpy array or scalar\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nUnion\n\nThe data you want to explore\n\n\nplain\nbool\nFalse\nPlain old way\n\n\nverbose\nbool\nFalse\nBoth summaty and plain\n\n\ndepth\nint\n0\nShow deeper summary, up to depth\n\n\nlvl\nint\n0\nIndentation level\n\n\ncolor\nOptional\nNone\nOverride get_config().color\n\n\nReturns\nstr\n\nThe summary\n\n\n\n\n\n\n\nnasties = randoms[:12].copy()\n\nnasties[0] *= 10000\nnasties[1] /= 10000\nnasties[3] = float('inf')\nnasties[4] = float('-inf')\nnasties[5] = float('nan')\nnasties = nasties.reshape((2,6))\n\n\nprint(lovely(nasties))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nprint(lovely(randoms[0]))\nprint(lovely(randoms[:2]))\nprint(lovely(randoms[:6].reshape(2, 3))) # More than 2 elements -&gt; show statistics\nprint(lovely(randoms[:11])) # More than 10 -&gt; don't show values\n\n1.764\narray[2] μ=1.082 σ=0.682 [1.764, 0.400]\narray[2, 3] n=6 x∈[-0.977, 2.241] μ=1.046 σ=1.090 [[1.764, 0.400, 0.979], [2.241, 1.868, -0.977]]\narray[11] x∈[-0.977, 2.241] μ=0.684 σ=0.938\n\n\nDo we have any floating point nasties? Are the values all zeros?\n\n# Statistics and range are calculated on good values only, if there are at lest 3 of them.\nprint(lovely(nasties))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nprint(lovely(nasties, color=False))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nprint(lovely(np.array([float(\"nan\")]*11)))\n\narray[11] NaN!\n\n\n\nprint(lovely(np.zeros(12, dtype=np.float16)))\nprint(lovely(np.array([], dtype=int)))\n\narray[12] f16 all_zeros\narray[0] i64 empty\n\n\n\nstr(lovely(np.array([], dtype=int)))\n\n'array[0] i64 \\x1b[38;2;127;127;127mempty\\x1b[0m'\n\n\n\nnp.set_printoptions(precision=3)\nprint(lovely(nasties, verbose=True))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\narray([[ 1.764e+04,  4.002e-05,  9.787e-01,        inf,       -inf,\n               nan],\n       [ 9.501e-01, -1.514e-01, -1.032e-01,  4.106e-01,  1.440e-01,\n         1.454e+00]])\n\n\n\nprint(lovely(nasties, plain=True))\n\narray([[ 1.76405235e+04,  4.00157208e-05,  9.78737984e-01,\n                    inf,            -inf,             nan],\n       [ 9.50088418e-01, -1.51357208e-01, -1.03218852e-01,\n         4.10598502e-01,  1.44043571e-01,  1.45427351e+00]])\n\n\n\nimage = np.load(\"mysteryman.npy\")\nimage[1,100,100] = float('nan')\n\nprint(lovely(image, depth=1))\n\narray[3, 196, 196] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073 NaN!\n  array[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036\n  array[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973 NaN!\n  array[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178\n\n\n\n# We don't really supposed complex numbers yet\nc = np.random.randn(2) + 1j*np.random.randn(2)\nprint(lovely(c))\n\narray([ 0.83771977-1.070215j  , -1.49011141-0.20912862j])\n\n\n\n# Other weirs stuff\n\nw = np.array([\"a\", \"b\", \"c\"])\nprint(lovely(w))\n\nz = np.array([{}, {\"a\": 1}, {\"b\": 2, \"c\": 3}])\nprint(lovely(z))\n\narray(['a', 'b', 'c'], dtype='&lt;U1')\narray([{}, {'a': 1}, {'b': 2, 'c': 3}], dtype=object)\n\n\n\ni = np.array([1, 2, 3])\ntest_eq(str(lovely(i)), \"array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]\")\n\n\ni = np.array([True, False, True])\ntest_eq(str(lovely(i)), 'array[3] bool x∈[False, True] μ=0.667 σ=0.471 [True, False, True]')",
+    "crumbs": [
+      "🔎 Array Representations",
+      "🧾 View as a summary"
+    ]
+  },
+  {
+    "objectID": "repr_str.html#pretty-printing",
+    "href": "repr_str.html#pretty-printing",
+    "title": "🧾 View as a summary",
+    "section": "",
+    "text": "source\n\n\n\n lovely (x:Union[numpy.ndarray,numpy.generic], plain:bool=False,\n         verbose:bool=False, depth:int=0, lvl:int=0,\n         color:Optional[bool]=None)\n\nPretty-print the stats of a numpy array or scalar\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nUnion\n\nThe data you want to explore\n\n\nplain\nbool\nFalse\nPlain old way\n\n\nverbose\nbool\nFalse\nBoth summaty and plain\n\n\ndepth\nint\n0\nShow deeper summary, up to depth\n\n\nlvl\nint\n0\nIndentation level\n\n\ncolor\nOptional\nNone\nOverride get_config().color\n\n\nReturns\nstr\n\nThe summary\n\n\n\n\n\n\n\nnasties = randoms[:12].copy()\n\nnasties[0] *= 10000\nnasties[1] /= 10000\nnasties[3] = float('inf')\nnasties[4] = float('-inf')\nnasties[5] = float('nan')\nnasties = nasties.reshape((2,6))\n\n\nprint(lovely(nasties))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nprint(lovely(randoms[0]))\nprint(lovely(randoms[:2]))\nprint(lovely(randoms[:6].reshape(2, 3))) # More than 2 elements -&gt; show statistics\nprint(lovely(randoms[:11])) # More than 10 -&gt; don't show values\n\n1.764\narray[2] μ=1.082 σ=0.682 [1.764, 0.400]\narray[2, 3] n=6 x∈[-0.977, 2.241] μ=1.046 σ=1.090 [[1.764, 0.400, 0.979], [2.241, 1.868, -0.977]]\narray[11] x∈[-0.977, 2.241] μ=0.684 σ=0.938\n\n\nDo we have any floating point nasties? Are the values all zeros?\n\n# Statistics and range are calculated on good values only, if there are at lest 3 of them.\nprint(lovely(nasties))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nprint(lovely(nasties, color=False))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nprint(lovely(np.array([float(\"nan\")]*11)))\n\narray[11] NaN!\n\n\n\nprint(lovely(np.zeros(12, dtype=np.float16)))\nprint(lovely(np.array([], dtype=int)))\n\narray[12] f16 all_zeros\narray[0] i64 empty\n\n\n\nstr(lovely(np.array([], dtype=int)))\n\n'array[0] i64 \\x1b[38;2;127;127;127mempty\\x1b[0m'\n\n\n\nnp.set_printoptions(precision=3)\nprint(lovely(nasties, verbose=True))\n\narray[2, 6] n=12 x∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\narray([[ 1.764e+04,  4.002e-05,  9.787e-01,        inf,       -inf,\n               nan],\n       [ 9.501e-01, -1.514e-01, -1.032e-01,  4.106e-01,  1.440e-01,\n         1.454e+00]])\n\n\n\nprint(lovely(nasties, plain=True))\n\narray([[ 1.76405235e+04,  4.00157208e-05,  9.78737984e-01,\n                    inf,            -inf,             nan],\n       [ 9.50088418e-01, -1.51357208e-01, -1.03218852e-01,\n         4.10598502e-01,  1.44043571e-01,  1.45427351e+00]])\n\n\n\nimage = np.load(\"mysteryman.npy\")\nimage[1,100,100] = float('nan')\n\nprint(lovely(image, depth=1))\n\narray[3, 196, 196] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073 NaN!\n  array[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036\n  array[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973 NaN!\n  array[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178\n\n\n\n# We don't really supposed complex numbers yet\nc = np.random.randn(2) + 1j*np.random.randn(2)\nprint(lovely(c))\n\narray([ 0.83771977-1.070215j  , -1.49011141-0.20912862j])\n\n\n\n# Other weirs stuff\n\nw = np.array([\"a\", \"b\", \"c\"])\nprint(lovely(w))\n\nz = np.array([{}, {\"a\": 1}, {\"b\": 2, \"c\": 3}])\nprint(lovely(z))\n\narray(['a', 'b', 'c'], dtype='&lt;U1')\narray([{}, {'a': 1}, {'b': 2, 'c': 3}], dtype=object)\n\n\n\ni = np.array([1, 2, 3])\ntest_eq(str(lovely(i)), \"array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]\")\n\n\ni = np.array([True, False, True])\ntest_eq(str(lovely(i)), 'array[3] bool x∈[False, True] μ=0.667 σ=0.471 [True, False, True]')",
+    "crumbs": [
+      "🔎 Array Representations",
+      "🧾 View as a summary"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "💟 Lovely NumPy",
+    "section": "Install",
+    "text": "Install\npip install lovely-numpy\nor\nconda install -c conda-forge lovely-numpy",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "💟 Lovely NumPy",
+    "section": "How to use",
+    "text": "How to use\nHow often do you find yourself debugging NumPy code? You dump your variable to the cell output, and see this:\n\nnumbers\n\narray([[[-0.3541, -0.1975, -0.6715],\n        [-0.3369, -0.1975, -0.9853],\n        ...,\n        [-0.4739, -0.3725, -0.689 ],\n        [ 2.2489,  2.4111,  2.396 ]],\n\n       [[-0.4054, -0.25  , -0.7238],\n        [-0.4226, -0.2325, -1.0724],\n        ...,\n        [-0.8507, -0.6702, -1.0201],\n        [ 2.1633,  2.3585,  2.3263]],\n\n       ...,\n\n       [[-0.8507, -0.3901, -1.1944],\n        [-0.7822, -0.2325, -1.4559],\n        ...,\n        [-1.5014, -1.2304, -1.4733],\n        [ 2.1804,  2.4111,  2.4308]],\n\n       [[-0.8335, -0.4076, -1.2293],\n        [-0.8164, -0.285 , -1.5256],\n        ...,\n        [-1.5528, -1.2829, -1.5256],\n        [ 2.1119,  2.341 ,  2.3611]]], shape=(196, 196, 3), dtype=float32)\n\n\nWas it really useful for you, as a human, to see all these numbers?\nWhat is the shape? The size?\nWhat are the statistics?\nAre any of the values nan or inf?\nIs it an image of a man holding a tench?\n\nfrom lovely_numpy import lo",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#lo-and-behold",
+    "href": "index.html#lo-and-behold",
+    "title": "💟 Lovely NumPy",
+    "section": "Lo and behold!",
+    "text": "Lo and behold!\n\nlo(numbers)\n\narray[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073\n\n\nBetter, eh?\n\nlo(numbers[1,:6,1]) # Still shows values if there are not too many.\n\narray[6] f32 x∈[-0.408, -0.232] μ=-0.340 σ=0.075 [-0.250, -0.232, -0.338, -0.408, -0.408, -0.408]\n\n\n\nspicy = numbers[0,:12,0].copy()\n\nspicy[0] *= 10000\nspicy[1] /= 10000\nspicy[2] = float('inf')\nspicy[3] = float('-inf')\nspicy[4] = float('nan')\n\nspicy = spicy.reshape((2,6))\nlo(spicy) # Spicy stuff\n\n\narray[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!\n\n\n\n\nlo(np.zeros((10, 10))) # A zero array - make it obvious\n\n\narray[10, 10] n=100 all_zeros\n\n\n\n\nlo(spicy, verbose=True)\n\n\narray[2, 6] f32 n=12 x∈[-3.541e+03, -3.369e-05] μ=-393.776 σ=1.113e+03 +Inf! -Inf! NaN!\narray([[-3540.5432,    -0.    , ...,        nan,    -0.4054],\n       [   -0.4226,    -0.4911, ...,    -0.5424,    -0.5082]],\n      shape=(2, 6), dtype=float32)",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#going-.deeper",
+    "href": "index.html#going-.deeper",
+    "title": "💟 Lovely NumPy",
+    "section": "Going .deeper",
+    "text": "Going .deeper\n\nlo(numbers.transpose(2,1,0)).deeper\n\narray[3, 196, 196] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073\n  array[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036\n  array[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973\n  array[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178\n\n\n\n# You can go deeper if you need to\nlo(numbers[:3,:4]).deeper(2)\n\narray[3, 4, 3] f32 n=36 x∈[-1.125, -0.197] μ=-0.563 σ=0.280\n  array[4, 3] f32 n=12 x∈[-0.985, -0.197] μ=-0.487 σ=0.259\n    array[3] f32 x∈[-0.672, -0.197] μ=-0.408 σ=0.197 [-0.354, -0.197, -0.672]\n    array[3] f32 x∈[-0.985, -0.197] μ=-0.507 σ=0.343 [-0.337, -0.197, -0.985]\n    array[3] f32 x∈[-0.881, -0.303] μ=-0.530 σ=0.252 [-0.405, -0.303, -0.881]\n    array[3] f32 x∈[-0.776, -0.303] μ=-0.506 σ=0.199 [-0.440, -0.303, -0.776]\n  array[4, 3] f32 n=12 x∈[-1.072, -0.232] μ=-0.571 σ=0.281\n    array[3] f32 x∈[-0.724, -0.250] μ=-0.460 σ=0.197 [-0.405, -0.250, -0.724]\n    array[3] f32 x∈[-1.072, -0.232] μ=-0.576 σ=0.360 [-0.423, -0.232, -1.072]\n    array[3] f32 x∈[-0.968, -0.338] μ=-0.599 σ=0.268 [-0.491, -0.338, -0.968]\n    array[3] f32 x∈[-0.968, -0.408] μ=-0.651 σ=0.235 [-0.577, -0.408, -0.968]\n  array[4, 3] f32 n=12 x∈[-1.125, -0.285] μ=-0.631 σ=0.280\n    array[3] f32 x∈[-0.828, -0.303] μ=-0.535 σ=0.219 [-0.474, -0.303, -0.828]\n    array[3] f32 x∈[-1.125, -0.285] μ=-0.628 σ=0.360 [-0.474, -0.285, -1.125]\n    array[3] f32 x∈[-1.020, -0.390] μ=-0.651 σ=0.268 [-0.542, -0.390, -1.020]\n    array[3] f32 x∈[-1.003, -0.478] μ=-0.708 σ=0.219 [-0.645, -0.478, -1.003]",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#now-in-.rgb-color",
+    "href": "index.html#now-in-.rgb-color",
+    "title": "💟 Lovely NumPy",
+    "section": "Now in .rgb color",
+    "text": "Now in .rgb color\nThe important queston - is it our man?\n\nlo(numbers).rgb\n\n\n\n\n\n\n\n\nMaaaaybe? Looks like someone normalized him.\n\nin_stats = ( (0.485, 0.456, 0.406),     # mean\n             (0.229, 0.224, 0.225) )    # std\n\n# numbers.rgb(in_stats, cl=True) # For channel-last input format\nlo(numbers).rgb(denorm=in_stats)\n\n# Denorm is used to convert the input to [0..1], which is then mapped to RGB.\n\n# lo(numbers).rgb(denorm=\"imagenet\") # same as above\n# lo(numbers).rgb(denorm=\"symmetric\") # [-1 .. 1] input\n# lo(numbers).rgb(denorm=\"minmax\") # Use the min/max elements in each channel to scale the input to [0..1]\n\n\n\n\n\n\n\n\nIt’s indeed our hero, the Tenchman!",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#see-the-.chans",
+    "href": "index.html#see-the-.chans",
+    "title": "💟 Lovely NumPy",
+    "section": "See the .chans",
+    "text": "See the .chans\n\n# .chans will map values betwen [-1,1] to colors.\n# Make our values fit into that range to avoid clipping.\nmean = np.array(in_stats[0])\nstd = np.array(in_stats[1])\nnumbers_01 = (numbers*std + mean).clip(0,1)\nlo(numbers_01)\n\narray[196, 196, 3] n=115248 (0.9Mb) x∈[0., 1.000] μ=0.361 σ=0.248\n\n\n\nlo(numbers_01).chans",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#grouping",
+    "href": "index.html#grouping",
+    "title": "💟 Lovely NumPy",
+    "section": "Grouping",
+    "text": "Grouping\n\n# Make 8 images with progressively higher brightness and stack them 2x2x2.\neight_images = (np.stack([numbers]*8) + np.linspace(-2, 2, 8)[:,None,None,None])\neight_images = (eight_images\n                     *np.array(in_stats[1])\n                     +np.array(in_stats[0])\n                ).clip(0,1).reshape(2,2,2,196,196,3)\n\nlo(eight_images)\n\narray[2, 2, 2, 196, 196, 3] n=921984 (7.0Mb) x∈[0., 1.000] μ=0.382 σ=0.319\n\n\n\nlo(eight_images).rgb",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#histogram",
+    "href": "index.html#histogram",
+    "title": "💟 Lovely NumPy",
+    "section": "Histogram",
+    "text": "Histogram\n\nlo(numbers+3).plt\n\n\n\n\n\n\n\n\n\nlo(numbers+3).plt(center=\"mean\", max_s=1000)\n\n\n\n\n\n\n\n\n\nlo(numbers+3).plt(center=\"range\")",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#options-docs",
+    "href": "index.html#options-docs",
+    "title": "💟 Lovely NumPy",
+    "section": "Options | Docs",
+    "text": "Options | Docs\n\nfrom lovely_numpy import set_config, config, lovely\n\n\nset_config(precision=5, sci_mode=True, color=False)\nlo(np.array([1.,2,np.nan]))\n\narray[3] μ=1.50000e+00 σ=5.00000e-01 NaN! [1.00000e+00, 2.00000e+00, nan]\n\n\n\nset_config(precision=None, sci_mode=None, color=None) # None -&gt; Reset to defaults\nlo(np.array([1.,2,np.nan]))\n\n\narray[3] μ=1.500 σ=0.500 NaN! [1.000, 2.000, nan]\n\n\n\n\n# Or with config context manager.\nwith config(sci_mode=True):\n    print(lo(np.array([1,2,3])))\n\nprint(lo(np.array([1,2,3])))\n\narray[3] i64 x∈[1, 3] μ=2.000e+00 σ=8.165e-01 [1, 2, 3]\narray[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#without-lo",
+    "href": "index.html#without-lo",
+    "title": "💟 Lovely NumPy",
+    "section": "Without Lo",
+    "text": "Without Lo\n\nfrom lovely_numpy import rgb, chans, plot\n\n\nlovely(numbers) # Returns `str`, that's why you see ''.\n# Note:  lo(x) returns a wrapper object with a `__repr__` and other methods.\n\n'array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073'\n\n\n\nrgb(numbers, denorm=in_stats) # OR: denorm='imagenet'\n\n\n\n\n\n\n\n\n\nchans(numbers*0.3+0.5)\n\n\n\n\n\n\n\n\n\nplot(numbers)",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "index.html#matplotlib-integration-docs",
+    "href": "index.html#matplotlib-integration-docs",
+    "title": "💟 Lovely NumPy",
+    "section": "Matplotlib integration | Docs",
+    "text": "Matplotlib integration | Docs\n\nlo(numbers).rgb(in_stats).fig # matplotlib figure\n\n\n\n\n\n\n\n\n\nlo(numbers).plt.fig.savefig('pretty.svg') # Save it\n\n\n!file pretty.svg; rm pretty.svg\n\npretty.svg: SVG Scalable Vector Graphics image\n\n\n\nfig = plt.figure(figsize=(8,3))\nfig.set_constrained_layout(True)\ngs = fig.add_gridspec(2,2)\nax1 = fig.add_subplot(gs[0, :])\nax2 = fig.add_subplot(gs[1, 0])\nax3 = fig.add_subplot(gs[1,1:])\n\nax2.set_axis_off()\nax3.set_axis_off()\n\nlo(numbers_01).plt(ax=ax1)\nlo(numbers_01).rgb(ax=ax2)\nlo(numbers_01).chans(ax=ax3);",
+    "crumbs": [
+      "💟 Lovely NumPy"
+    ]
+  },
+  {
+    "objectID": "utils.pad.html",
+    "href": "utils.pad.html",
+    "title": "🔲 Pad and frame",
+    "section": "",
+    "text": "source\n\npad_frame\n\n pad_frame (t:numpy.ndarray, frame_px:int=1, val:float=0)\n\nPad H and W dimensitons of an image tensor with val of thickness frame_px\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nt\nndarray\n\ntorch.Tensor, # 3D+ image tensor, […,H,W,C]\n\n\nframe_px\nint\n1\nNumber of pixels to pad each side.\n\n\nval\nfloat\n0\nValue to pad with.\n\n\n\nExamples\n\npad_frame(np.zeros((3,3,1)), frame_px=2, val=1).transpose(-1,0,1).astype(int)\n\narray([[[1, 1, 1, 1, 1, 1, 1],\n        [1, 1, 1, 1, 1, 1, 1],\n        [1, 1, 0, 0, 0, 1, 1],\n        [1, 1, 0, 0, 0, 1, 1],\n        [1, 1, 0, 0, 0, 1, 1],\n        [1, 1, 1, 1, 1, 1, 1],\n        [1, 1, 1, 1, 1, 1, 1]]])\n\n\n\n# 1px black frame inside 2px white frame (gutter).\npad_frame(pad_frame(np.ones((3,3,1))), frame_px=2, val=1 ).transpose(-1,0,1).astype(int)\n\narray([[[1, 1, 1, 1, 1, 1, 1, 1, 1],\n        [1, 1, 1, 1, 1, 1, 1, 1, 1],\n        [1, 1, 0, 0, 0, 0, 0, 1, 1],\n        [1, 1, 0, 1, 1, 1, 0, 1, 1],\n        [1, 1, 0, 1, 1, 1, 0, 1, 1],\n        [1, 1, 0, 1, 1, 1, 0, 1, 1],\n        [1, 1, 0, 0, 0, 0, 0, 1, 1],\n        [1, 1, 1, 1, 1, 1, 1, 1, 1],\n        [1, 1, 1, 1, 1, 1, 1, 1, 1]]])\n\n\n\nsource\n\n\npad_frame_gutters\n\n pad_frame_gutters (t:numpy.ndarray, gutter_px=3, frame_px=1)\n\nAdd a black frame and white gutters around an image\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nt\nndarray\n\n3D+ Tensor image tensor, […,H,W,C]\n\n\ngutter_px\nint\n3\nWrite gutter in pixels.\n\n\nframe_px\nint\n1\nBlack frame, in pixels\n\n\n\nExamples\n\nLo(image)\n\narray[3, 196, 196] n=115248 (0.9Mb) x∈[-4.053e-09, 1.000] μ=0.361 σ=0.248\n\n\n\nLo(pad_frame_gutters(image.transpose(1, 2, 0), gutter_px=15, frame_px=3))\n\narray[232, 232, 3] n=161472 (1.2Mb) x∈[-4.053e-09, 1.000] μ=0.500 σ=0.359\n\n\n\ndef to_pil(x):\n    return Image.fromarray(np.uint8(x*255))\n\nto_pil(pad_frame_gutters(image.transpose(1, 2, 0), gutter_px=15, frame_px=3))",
+    "crumbs": [
+      "🖼️ Image utils",
+      "🔲 Pad and frame"
+    ]
+  },
+  {
+    "objectID": "utils.utils.html",
+    "href": "utils.utils.html",
+    "title": "Misc utils",
+    "section": "",
+    "text": "source\n\npretty_str\n\n pretty_str (x)\n\nA slightly better way to print float-y values. Works for np.ndarray, torch.Tensor, jax.DeviceArray, and scalars.\n\nnasties = randoms[:12].copy()\n\nnasties[0] *= 10000\nnasties[1] /= 10000\nnasties[3] = float('inf')\nnasties[4] = float('-inf')\nnasties[5] = float('nan')\nnasties = nasties.reshape((2,6))\n\n\npretty_str(nasties)\n\n'[[1.764e+04, 4.002e-05, 0.979, inf, -inf, nan], [0.950, -0.151, -0.103, 0.411, 0.144, 1.454]]'\n\n\n\ntest_eq(pretty_str(nasties), '[[1.764e+04, 4.002e-05, 0.979, inf, -inf, nan], [0.950, -0.151, -0.103, 0.411, 0.144, 1.454]]')\n\n\nsource\n\n\nsparse_join\n\n sparse_join (lst, sep=' ')\n\n\nsource\n\n\nansi_color\n\n ansi_color (s:str, col:str, use_color=True)\n\nVery minimal ANSI color support\n\nsource\n\n\nbytes_to_human\n\n bytes_to_human (num_bytes)\n\n\nprint(bytes_to_human(110))     # 0.1Kb\nprint(bytes_to_human(1024))    # 1Kb\nprint(bytes_to_human(1150))    # 1.1Kb\nprint(bytes_to_human(1024*1024+512))  # 1.0Mb\nprint(bytes_to_human(1024*1024*1024*30.51)) # 31Gb\n\n0.1Kb\n1Kb\n1.1Kb\n1.0Mb\n31Gb\n\n\n\nsource\n\n\nnp_to_str_common\n\n np_to_str_common (x:Union[numpy.ndarray,numpy.generic], color=True,\n                   ddof=0)\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nUnion\n\nInput\n\n\ncolor\nbool\nTrue\nANSI color highlighting\n\n\nddof\nint\n0\nFor “std” unbiasing\n\n\n\n\nwith config(show_mem_above=0):\n    print(np_to_str_common(nasties))\n\nx∈[-0.151, 1.764e+04] μ=1.960e+03 σ=5.544e+03 +Inf! -Inf! NaN!\n\n\n\nnp_to_str_common(np.array([1., 2, 3]))\n\n'x∈[1.000, 3.000] μ=2.000 σ=0.816'\n\n\n\nsource\n\n\nhistory_warning\n\n history_warning ()\n\nIssue a warning (once) ifw e are running in IPYthon with output cache enabled\n\nclass Test:\n    @cached_property\n    def test(self):\n        print(\"property call \")\n        return 123\n\n    def __repr__(self):\n        return \"Test object\"\n\n\nt=Test()\nprint(t.test)\nprint(t.test)\nt\n\nproperty call \n123\n123\n\n\nTest object\n\n\n\nsource\n\n\nin_debugger\n\n in_debugger ()\n\n*Returns True if a debugger was used.\nNote: This funciton will keep returning True even after you exit the debugger.*\n\ntest_eq(in_debugger(), False)"
+  },
+  {
+    "objectID": "utils.colormap.html",
+    "href": "utils.colormap.html",
+    "title": "🎨 color mapping",
+    "section": "",
+    "text": "lo(image_01).rgb\n\n\n\n\n\n\n\n\n\nplt.imshow(image_11[:,:,1], cmap=\"twilight\", vmin=-1); # One single channel.\n\n\n\n\n\n\n\n\nThis works, but now this would be interpreted as a 1960 196x3 RGBA images.\nWhat I had in ming was more like 30 196x196 RGBA images (3 channels for each of the 10 images).\nKeep this in mind when using cmap.\n\nimage_batch = image_01.transpose(2,0,1)[None].repeat(10, axis=0)\nprint(lo(image_batch))\n\nvals = (image_batch + 1)/2\nlut_idxs = (vals * cmap.N).astype(np.int64)\n\nmapped = lut.take(lut_idxs, axis=0, mode=\"clip\")\n\nprint(lo(mapped))\nlo(mapped[:2]).rgb # First 2 of the images, each as 3 channels.\n\narray[10, 3, 196, 196] n=1152480 x∈[-4.053e-09, 1.000] μ=0.361 σ=0.248\narray[10, 3, 196, 196, 4] n=4609920 x∈[0.067, 1.000] μ=0.534 σ=0.334\n\n\n\n\n\n\n\n\n\n\nExtend the lut to cover +/-inf too.\n\nsource\n\n\nInfCmap\n\n InfCmap (cmap:matplotlib.colors.Colormap, below:Optional[str]=None,\n          above:Optional[str]=None, nan:Optional[str]=None,\n          ninf:Optional[str]=None, pinf:Optional[str]=None)\n\n*Matplotlib colormap extended to have colors for +/-inf\nParameters extept cmap are matplotlib color strings.*\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\ncmap\nColormap\n\nBase matplotlib colormap\n\n\nbelow\nOptional\nNone\nValues below 0\n\n\nabove\nOptional\nNone\nValues above 1\n\n\nnan\nOptional\nNone\nNaNs\n\n\nninf\nOptional\nNone\n-inf\n\n\npinf\nOptional\nNone\n+inf\n\n\n\n\ntcmap = InfCmap(get_cmap(\"twilight\"),\n                  below=\"blue\", above=\"red\", nan=\"yellow\")\nrgb(tcmap(bad_image[:,:,0])) # Note: Mapped only first channel\n\n\n\n\n\n\n\n\n\ntcmap = InfCmap(get_cmap(\"twilight\"),\n                  below=\"blue\", above=\"red\",\n                  nan=\"yellow\", ninf=\"cyan\", pinf=\"fuchsia\")\nrgb(tcmap(bad_image)[:,:,0]) # Note: Mapped all channels, show only the mapping for the first.\n\n\n\n\n\n\n\n\n\ntcmap = InfCmap(get_cmap(\"bwr\"),\n                  below=\"blue\", above=\"red\",\n                  nan=\"yellow\", ninf=\"cyan\", pinf=\"fuchsia\")\nrgb(tcmap(bad_image.transpose(2,0,1)))",
+    "crumbs": [
+      "🖼️ Image utils",
+      "🎨 color mapping"
+    ]
+  },
+  {
+    "objectID": "repr_rgb.html",
+    "href": "repr_rgb.html",
+    "title": "🖌️ View as RGB images",
+    "section": "",
+    "text": "fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(6, 2))\nplt.close(fig)\nax1.set_xticks([]); ax1.set_yticks([]); ax2.set_xticks([]);\nax2.set_yticks([]); ax3.set_xticks([]); ax3.set_yticks([])\n\nnp.random.seed(1337)\nr = np.random.rand(10, 10, 3)\n\nx = (r*256).astype(np.uint8)\nfig_rgb(x, scale=10, ax=ax1)\n\nx = r.astype(np.float16)\nfig_rgb(x, scale=10, ax=ax2)\n\nfig_rgb((r &gt; 0.5), scale=10, ax=ax3)\n\n\n\n\n\n\n\n\n\nsource\n\nrgb\n\n rgb (x:numpy.ndarray, denorm:Any=None, cl:Any=True, gutter_px:int=3,\n      frame_px:int=1, scale:int=1, view_width:int=966, clip:bool=True,\n      ax:Optional[matplotlib.axes._axes.Axes]=None)\n\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nndarray\n\nArray to display. [[…], C,H,W] or [[…], H,W,C]\n\n\ndenorm\nAny\nNone\nReverse per-channel normalization\n\n\ncl\nAny\nTrue\nChannel-last\n\n\ngutter_px\nint\n3\nIf more than one tensor -&gt; tile with this gutter width\n\n\nframe_px\nint\n1\nIf more than one tensor -&gt; tile with this frame width\n\n\nscale\nint\n1\nStretch the image. Only integers please.\n\n\nview_width\nint\n966\ntarget width of the image\n\n\nclip\nbool\nTrue\nSilently clip RGB values to [0, 1]\n\n\nax\nOptional\nNone\nMatplotlib axes\n\n\nReturns\nRGBProxy\n\n\n\n\n\n\ntwo_images = np.stack([image]*2)\nlo(two_images)\n\narray[2, 196, 196, 3] f32 n=230496 (0.9Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073\n\n\n\nin_stats = (    (0.485, 0.456, 0.406),  # Mean\n                (0.229, 0.224, 0.225) ) # std\nrgb(two_images, denorm=in_stats)\n\n\n\n\n\n\n\n\n\n# We also have presets\nrgb(two_images, denorm='imagenet')\n\n\n\n\n\n\n\n\n\ntenchman_01 = image * np.array(in_stats[1]) + np.array(in_stats[0]) # This image is in the range [0 .. 1] (+/- eps)\ntenchman_minus1_1 = tenchman_01 * 2 - 1 # This one is in the range [-1 .. 1] - also somewhat common\nrgb(tenchman_minus1_1, denorm='symmetric') # 'symmetric' does the conversion\n\n\n\n\n\n\n\n\n\nrgb(image, denorm='minmax') # 'minmax' scales the full range of the inputs to [0..1].\n\n\n\n\n\n\n\n\n\n# Make 8 images with progressively higher brightness and stack them 2x2x2.\neight_images = (np.stack([image]*8) + np.linspace(-2, 2, 8)[:,None,None,None])\neight_images = (eight_images\n                     *np.array(in_stats[1])\n                     +np.array(in_stats[0])\n                ).clip(0,1).reshape(2,2,2,196,196,3)\n\nlo(eight_images)\n\narray[2, 2, 2, 196, 196, 3] n=921984 (7.0Mb) x∈[0., 1.000] μ=0.382 σ=0.319\n\n\n\nrgb(eight_images)\n\n\n\n\n\n\n\n\n\n# You can do channel-first too (default in PyTorch):\n# Also, can scale up the image\nrgb(image.transpose(-1, 0, 1), cl=False, scale=2)",
+    "crumbs": [
+      "🔎 Array Representations",
+      "🖌️ View as RGB images"
+    ]
+  },
+  {
+    "objectID": "repr_plt.html",
+    "href": "repr_plt.html",
+    "title": "📊 View as a histogram",
+    "section": "",
+    "text": "source\n\nplot\n\n plot (x:numpy.ndarray, center:str='zero', max_s:int=10000, plt0:Any=True,\n       ax:Optional[matplotlib.axes._axes.Axes]=None, ddof:int=0)\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nndarray\n\nYour data\n\n\ncenter\nstr\nzero\nCenter plot on zero, mean, or range\n\n\nmax_s\nint\n10000\nDraw up to this many samples. =0 to draw all\n\n\nplt0\nAny\nTrue\nTake zero values into account\n\n\nax\nOptional\nNone\nOptionally, supply your own matplotlib axes.\n\n\nddof\nint\n0\nApply bias correction to std\n\n\nReturns\nPlotProxy\n\n\n\n\n\n\nplot(np.array([]))\n\n\n\n\n\n\n\n\n\nnp.random.seed(1)\nx = np.random.randn(100000)+3\nplot(x)\n\n\n\n\n\n\n\n\n\nplot(x, center=\"range\")\n\n\n\n\n\n\n\n\n\nplot(x-3, center=\"mean\")\n\n\n\n\n\n\n\n\n\nplot(np.minimum(x-3, 0))\n\n\n\n\n\n\n\n\n\nplot(np.maximum(x-3, 0), plt0=0)\n\n\n\n\n\n\n\n\n\n# Very large outliers - don't print all sigmas\n\nx2 = x.copy()\nx2[0] = 1000\nplot(x2, center=\"range\")\n\n\n\n\n\n\n\n\n\nfig, (ax1,ax2) = plt.subplots(2, figsize=(6, 4))\nfig.tight_layout()\nplot(x, ax=ax1)\nplot(np.zeros(100), ax=ax2);",
+    "crumbs": [
+      "🔎 Array Representations",
+      "📊 View as a histogram"
+    ]
+  },
+  {
+    "objectID": "03d_utils.config.html",
+    "href": "03d_utils.config.html",
+    "title": "🤔 Config",
+    "section": "",
+    "text": "Type\nDefault\nDetails\n\n\n\n\nprecision\nint\n3\nDigits after .\n\n\nthreshold_max\nint\n3\n.abs() larger than 1e3 -&gt; Sci mode\n\n\nthreshold_min\nint\n-4\n.abs() smaller that 1e-4 -&gt; Sci mode\n\n\nsci_mode\nNoneType\nNone\nSci mode (2.3e4). None=auto\n\n\nshow_mem_above\nint\n1024\nShow memory usage in b/Kb/Mb/Gb if it’s larger than this\n\n\nindent\nint\n2\nIndent for .deeper()\n\n\ncolor\nbool\nTrue\nANSI colors in text\n\n\nverbose\nbool\nFalse\nShow the default repr by default\n\n\ndeeper_width\nint\n9\nFor .deeper, width per level\n\n\nplt_seed\nint\n42\nSampling seed for plot\n\n\nfig_close\nbool\nTrue\nClose matplotlib Figure\n\n\nfig_show\nbool\nFalse\nCall plt.show() for .plt, .chans and .rgb\n\n\n\n\n\n\nsource",
+    "crumbs": [
+      "✨ Misc",
+      "🤔 Config"
+    ]
+  },
+  {
+    "objectID": "03d_utils.config.html#examples",
+    "href": "03d_utils.config.html#examples",
+    "title": "🤔 Config",
+    "section": "Examples",
+    "text": "Examples\n\nfrom lovely_numpy import lo, lovely, set_config, get_config, config\n\n\nPrecision\n\nset_config(precision=5)\nlo(np.array([1., 2, 3]))\n\narray[3] x∈[1.00000, 3.00000] μ=2.00000 σ=0.81650 [1.00000, 2.00000, 3.00000]\n\n\n\n\nScientific mode\n\nset_config(sci_mode=True) # Force always on\nlo(np.array([1., 2, 3]))\n\narray[3] x∈[1.00000e+00, 3.00000e+00] μ=2.00000e+00 σ=8.16497e-01 [1.00000e+00, 2.00000e+00, 3.00000e+00]\n\n\n\n\nColor on/off\n\nset_config(color=False) # Force always off\nlo(np.array(np.nan))\n\narray NaN! nan\n\n\n\n\nIn-memory size of data\n\nlo(np.array(np.ones((100))))\n\narray[100] x∈[1.00000e+00, 1.00000e+00] μ=1.00000e+00 σ=0.\n\n\n\nset_config(show_mem_above=10)\nlo(np.array(np.ones((100))))\n\narray[100] 0.8Kb x∈[1.00000e+00, 1.00000e+00] μ=1.00000e+00 σ=0.\n\n\n\n\nVerbose by default\n\nset_config(verbose=True)\nlo(np.ones(100, dtype=np.int8))\n\narray[100] i8 100b x∈[1, 1] μ=1.00000e+00 σ=0.\narray([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,\n       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,\n       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,\n       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,\n       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int8)\n\n\n\n\nReser to defaults\n\nset_config(precision=None, sci_mode=None, color=None, show_mem_above=1024, verbose=None)\n\n\nlo(np.array([1., 2, np.nan]))\n\n\narray[3] μ=1.500 σ=0.500 NaN! [1.000, 2.000, nan]\n\n\n\n\nnp.array([1,2])\n\narray([1, 2])\n\n\n\n\nContext manager\n\nwith config(sci_mode=True):\n    print(lo(np.array([1., 2, 3])))\n\narray[3] x∈[1.000e+00, 3.000e+00] μ=2.000e+00 σ=8.165e-01 [1.000e+00, 2.000e+00, 3.000e+00]\n\n\n\nlo(np.array([1., 2, 3]))\n\narray[3] x∈[1.000, 3.000] μ=2.000 σ=0.816 [1.000, 2.000, 3.000]\n\n\n\n\nMatplotlib and seed\n\na = np.random.default_rng(seed=1).normal(size=1000)\n\n\n_ = lo(a).plt() # The figure was closed, it will not be displayed\n\n\nset_config(fig_close=False)\n_ = lo(a).plt() # figure was not closed. All figures that are not closed are displayed after the cell runs.\n\n\n\n\n\n\n\n\nFor performance reasons, .plt will randomly sample up tp max_s elements from the data (10k be default).\nYou can change the seed used for this sampling (42 by default):\n\nset_config(plt_seed=1)\nlo(a).plt(max_s=100)\n\n\n\n\n\n\n\n\n\nset_config(plt_seed=2)\nlo(a).plt(max_s=100)\n\n\n\n\n\n\n\n\nMore details in matplotlib",
+    "crumbs": [
+      "✨ Misc",
+      "🤔 Config"
+    ]
+  },
+  {
+    "objectID": "lo.html",
+    "href": "lo.html",
+    "title": "👁️ Lo and behold!",
+    "section": "",
+    "text": "source\n\nLo\n\n Lo (x:Union[numpy.ndarray,numpy.generic], plain=False, verbose=None,\n     depth=0, color:Optional[bool]=None)\n\nLo and behold! What a lovely numpy.ndarray!\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nUnion\n\nYour data\n\n\nplain\nbool\nFalse\nShow as plain text - values only\n\n\nverbose\nNoneType\nNone\nVerbose - show values too\n\n\ndepth\nint\n0\nExpand up to depth\n\n\ncolor\nOptional\nNone\nUse ANSI colors\n\n\n\n\nsource\n\n\nlo\n\n lo (x:Union[numpy.ndarray,numpy.generic], plain:bool=False,\n     verbose:bool=None, depth:int=0, color:Optional[bool]=None)\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nx\nUnion\n\nYour data\n\n\nplain\nbool\nFalse\nShow as plain text - values only\n\n\nverbose\nbool\nNone\nVerbose - show values too\n\n\ndepth\nint\n0\nExpand up to depth\n\n\ncolor\nOptional\nNone\nUse ANSI colors\n\n\n\n\n\nExamples\n\nt = np.array([[1,2,3], [4,5,6]])\nt\n\narray([[1, 2, 3],\n       [4, 5, 6]])\n\n\n\nlo(t).v # Verbose\n\narray[2, 3] i64 n=6 x∈[1, 6] μ=3.500 σ=1.708 [[1, 2, 3], [4, 5, 6]]\narray([[1, 2, 3],\n       [4, 5, 6]])\n\n\n\nlo(t).p # Plain\n\narray([[1, 2, 3],\n       [4, 5, 6]])\n\n\n\nlo(t).deeper\n\narray[2, 3] i64 n=6 x∈[1, 6] μ=3.500 σ=1.708 [[1, 2, 3], [4, 5, 6]]\n  array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]\n  array[3] i64 x∈[4, 6] μ=5.000 σ=0.816 [4, 5, 6]\n\n\n\nlo(t[None]).deeper(2) # We need to go deeper\n\narray[1, 2, 3] i64 n=6 x∈[1, 6] μ=3.500 σ=1.708 [[[1, 2, 3], [4, 5, 6]]]\n  array[2, 3] i64 n=6 x∈[1, 6] μ=3.500 σ=1.708 [[1, 2, 3], [4, 5, 6]]\n    array[3] i64 x∈[1, 3] μ=2.000 σ=0.816 [1, 2, 3]\n    array[3] i64 x∈[4, 6] μ=5.000 σ=0.816 [4, 5, 6]\n\n\n\nin_stats = ( (0.485, 0.456, 0.406),     # mean\n             (0.229, 0.224, 0.225) )    # std\nimage = np.load(\"mysteryman.npy\").transpose(1,2,0)\nlo(image)\n\narray[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073\n\n\n\nspicy = image.flatten()[:12].copy()\n\nspicy[0] *= 10000\nspicy[1] /= 10000\nspicy[2] = float('inf')\nspicy[3] = float('-inf')\nspicy[4] = float('nan')\n\nspicy = spicy.reshape((2,6))\nlo(spicy)\n\n\narray[2, 6] f32 n=12 x∈[-3.541e+03, -1.975e-05] μ=-393.848 σ=1.113e+03 +Inf! -Inf! NaN!\n\n\n\n\n# image = np.zeros((196,196,3))\n# image[:75,::2,:] = 1\n# image[75::2,:,:] = 1\n\n\nlo(image).rgb #.fig.savefig(\"output.png\", metadata={\"Software\": None})\n\n\n\n\n\n\n\n\n\nlo(image).rgb(scale=2, denorm=in_stats)\n\n\n\n\n\n\n\n\n\nlo(image*0.3+0.5)\n\narray[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-0.135, 1.292] μ=0.384 σ=0.322\n\n\n\nx = np.random.randn(100000)+3\nlo(x).plt(center=\"mean\")",
+    "crumbs": [
+      "✨ Misc",
+      "👁️ Lo and behold!"
+    ]
+  },
+  {
+    "objectID": "utils.tile2d.html",
+    "href": "utils.tile2d.html",
+    "title": "🏁 Image grid",
+    "section": "",
+    "text": "lo(number_images)\n\narray[100, 64, 64, 3] n=1228800 x∈[0., 1.000] μ=0.784 σ=0.171\n\n\n\n# number_images[10].rgb(cl=True)\n\n\nt = number_images\n\n\nn_images = t.shape[0]\nn_channels = t.shape[-1]\nxy_shape = t.shape[1:3]\n\nn_rows, n_cols = fit_columns(t, view_width=966)\n\n\n# We need to form the images inro a rectangular area. For this, we might\n# need to add some dummy images to the last row, whoch might be not be full.\nn_extra_images = n_rows*n_cols - t.shape[0]\nif n_extra_images:\n    extra_images = np.ones((n_extra_images, *t.shape[1:]))\n    # extra_images = torch.ones((n_extra_images, *t.shape[1:]))\n    t = np.concatenate([ t, extra_images ])\n\n\nlo(t)\n\narray[104, 64, 64, 3] n=1277952 x∈[0., 1.000] μ=0.792 σ=0.173\n\n\n\n# This is where the fun begins! Imagine 't' is tensor[20, 128, 128, 3].\n# and we want 5 rows, 4 columns each.\n\nt = t.reshape(n_rows, n_cols, *t.shape[-3:])\n# Now t is tensor[5, 4, 128, 128, 3]\n\nt = t.transpose(0, 2, 1, 3, 4)\n# now t is tensor[5, 128, 4, 128, 3]\n# If we just squick dimensions 0,1 and 2,3 togerther, we get the image we want.\nt = t.reshape(n_rows*xy_shape[0], n_cols*xy_shape[1], n_channels)\n\n\nlo(t).rgb(cl=1)\n\n\n\n\n\n\n\n\n\nsource\n\ntile2d\n\n tile2d (t:numpy.ndarray, view_width=966)\n\nTile images in a grid.\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nt\nndarray\n\nArray containing images, shape=(n,h,w,c)\n\n\nview_width\nint\n966\nTry to protuce an images at most this wide\n\n\n\n\nlo(tile2d(number_images[:17]))\n\narray[192, 512, 3] n=294912 x∈[0., 1.000] μ=0.852 σ=0.160\n\n\n\nlo(tile2d(number_images[:16])).rgb\n\n\n\n\n\n\n\n\nCombine with utils.pad.pad_frame_gutters to make it look better\n\nlo(tile2d(pad_frame_gutters(number_images[:16]), view_width=1200)).rgb\n\n\n\n\n\n\n\n\n\nsource\n\n\nhypertile\n\n hypertile (t:numpy.ndarray, frame_px=1, gutter_px=3, view_width=966)\n\nRecursively tile images on a 2d grid\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nt\nndarray\n\ntorch.Tensor, # input tensor, shape=([…], B, H, W, C)\n\n\nframe_px\nint\n1\nFrame width for the innermost group\n\n\ngutter_px\nint\n3\nGutter width for the innermost group\n\n\nview_width\nint\n966\nTry to protuce an images at most this wide\n\n\n\n\nhyperimages = number_images.reshape(2, 5, 10, 64, 64, 3)\nlo(hyperimages)\n\narray[2, 5, 10, 64, 64, 3] n=1228800 x∈[0., 1.000] μ=0.784 σ=0.171\n\n\n\nlo(hypertile(hyperimages)).rgb",
+    "crumbs": [
+      "🖼️ Image utils",
+      "🏁 Image grid"
+    ]
+  }
+]
