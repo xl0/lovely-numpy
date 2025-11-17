@@ -177,6 +177,12 @@ in_stats = ( (0.485, 0.456, 0.406),     # mean
 
 # numbers.rgb(in_stats, cl=True) # For channel-last input format
 lo(numbers).rgb(denorm=in_stats)
+
+# Denorm is used to convert the input to [0..1], which is then mapped to RGB.
+
+# lo(numbers).rgb(denorm="imagenet") # same as above
+# lo(numbers).rgb(denorm="symmetric") # [-1 .. 1] input
+# lo(numbers).rgb(denorm="minmax") # Use the min/max elements in each channel to scale the input to [0..1]
 ```
 
 ![](index_files/figure-commonmark/cell-12-output-1.png)
