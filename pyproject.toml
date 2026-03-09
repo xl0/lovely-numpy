@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lovely-numpy"
+dynamic = ["version"]
+description = "💟 Lovely numpy"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [{name = "Alexey Zaytsev", email = "alexey.zaytsev@gmail.com"}]
+keywords = ['jupyter', 'numpy', 'visualisation']
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+dependencies = ['numpy>=1.17', 'fastcore', 'matplotlib']
+
+[project.urls]
+Repository = "https://github.com/xl0/lovely-numpy"
+Documentation = "https://xl0.github.io/lovely-numpy"
+
+[project.entry-points.nbdev]
+lovely_numpy = "lovely_numpy._modidx:d"
+
+[project.optional-dependencies]
+dev = ['scipy', 'ipython']
+
+[tool.setuptools.dynamic]
+version = {attr = "lovely_numpy.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["lovely_numpy"]
+
+[tool.nbdev]
+branch = 'master'
+custom_sidebar = true
