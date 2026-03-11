@@ -172,7 +172,7 @@ def in_debugger():
     return getattr(sys, "gettrace", None) and sys.gettrace() is not None
 
 # %% ../../nbs/03_utils.utils.ipynb #29dc103a
-def svg_miniplot(counts: np.ndarray, boxes: np.ndarray, width=60, height=18):
+def svg_miniplot(counts: np.ndarray, width=60, height=18):
 
     step = width / len(counts)
     bar_w = max(step - 1.5, 1)
