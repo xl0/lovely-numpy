@@ -148,11 +148,8 @@ def np_to_str_common(   x: Union[np.ndarray, np.number],       # Input
             _min, _max = gx.min(), gx.max()
             counts, _ = np.histogram(sample(gx, 10000, True)[0], bins=10, range=(_min, _max))
             minmax = f"x∈[{pretty_str(_min)} |{unicode_miniplot(counts)}| {pretty_str(_max)}]" if gx.size > 2 else None
-        elif gx.size > 2:
-            
-            minmax = f"x∈[{pretty_str(gx.min())}, {pretty_str(gx.max())}]" if gx.size > 2 else None
         else:
-            minmax = None
+            minmax = f"x∈[{pretty_str(gx.min())}, {pretty_str(gx.max())}]" if gx.size > 2 else None
 
 
         meanstd = f"μ={pretty_str(gx.mean())} σ={pretty_str(gx.std(ddof=ddof))}" if gx.size >= 2 else None
