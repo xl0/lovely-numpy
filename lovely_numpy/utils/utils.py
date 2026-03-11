@@ -144,13 +144,14 @@ def np_to_str_common(   x: Union[np.ndarray, np.number],       # Input
         # Calculate stats on good values only.
         gx = x[ np.isfinite(x) ]
 
-        if show_histogram and gx.size > 50:
+        if gx.size >= 2:
             _min, _max = gx.min(), gx.max()
-            counts, _ = np.histogram(sample(gx, 10000, True)[0], bins=10, range=(_min, _max))
-            minmax = f"x∈[{pretty_str(_min)} |{unicode_miniplot(counts)}| {pretty_str(_max)}]" if gx.size > 2 else None
-        else:
-            minmax = f"x∈[{pretty_str(gx.min())}, {pretty_str(gx.max())}]" if gx.size > 2 else None
-
+            if show_histogram and _min != _max and gx.size > 50:
+                counts, _ = np.histogram(sample(gx, 10000, True)[0], bins=10, range=(_min, _max))
+                minmax = f"x∈[{pretty_str(_min)} |{unicode_miniplot(counts)}| {pretty_str(_max)}]" if gx.size > 2 else None
+            else:
+                minmax = f"x∈[{pretty_str(_min)}, {pretty_str(_max)}]" if gx.size > 2 else None
+        else: minmax = None
 
         meanstd = f"μ={pretty_str(gx.mean())} σ={pretty_str(gx.std(ddof=ddof))}" if gx.size >= 2 else None
         summary = sparse_join([minmax, meanstd])
@@ -172,6 +173,9 @@ def in_debugger():
 
 # %% ../../nbs/03_utils.utils.ipynb #29dc103a
 def svg_miniplot(counts: np.ndarray, width=60, height=18):
+    counts = np.asarray(counts)
+    if counts.size == 0:
+        return ""
 
     step = width / len(counts)
     bar_w = max(step - 1.5, 1)
