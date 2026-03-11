@@ -12,7 +12,7 @@ from matplotlib import axes, figure, pyplot as plt
 from .repr_rgb import fig_rgb, rgb
 from .utils.colormap import InfCmap, get_cmap
 from .utils.config import config, get_config
-from .utils.utils import cached_property
+from functools import cached_property
 
 # %% ../nbs/05_repr_chans.ipynb #fee8a07c
 def fig_chans(  x           :np.ndarray,      # Input array
@@ -51,6 +51,8 @@ def fig_chans(  x           :np.ndarray,      # Input array
 
 # %% ../nbs/05_repr_chans.ipynb #0b54e164
 class ChanProxy():
+
+    params: dict
     def __init__(self, x: np.ndarray):
         self.x = x
         self.params = dict( cmap        ="twilight",

@@ -10,7 +10,7 @@ from fastcore.foundation import store_attr
 import warnings
 import numpy as np
 
-from .utils import pretty_str, sparse_join, np_to_str_common, in_debugger, bytes_to_human
+from .utils import pretty_str, sparse_join, np_to_str_common, in_debugger, bytes_to_human, InputType
 from .utils.config import get_config, set_config, config
 
 # %% ../nbs/00_repr_str.ipynb #9ac1106c
@@ -27,22 +27,26 @@ dtnames =   {   "float16": "f16",
                 "int64": "i64",
             }
 
-def short_dtype(x: Union[np.ndarray, np.generic]):
-    return dtnames.get(x.dtype.name, str(x.dtype))
+def short_dtype(x: InputType):
+    if isinstance(x, (np.ndarray, np.number)):
+        return dtnames.get(x.dtype.name, str(x.dtype))
+    return str(type(x))
 
 # %% ../nbs/00_repr_str.ipynb #d539374c
-def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explore
+def lovely( x       :InputType, # The data you want to explore
             plain   :bool   =False,                 # Plain old way
             verbose :bool   =False,                 # Both summaty and plain
             depth   :int    =0,                     # Show deeper summary, up to `depth`
             lvl     :int    =0,                     # Indentation level
-            color   :O[bool]=None                   # Override `get_config().color`
+            color   :O[bool]=None,                  # Override `get_config().color`
+            show_histogram: O[bool]=None            # Show histogram
             ) -> str:                               # The summary
+    
 
     "Pretty-print the stats of a numpy array or scalar"
 
     if (plain or
-        not isinstance(x, (np.ndarray, np.generic)) or
+        not isinstance(x, (np.ndarray, np.number)) or
         np.iscomplexobj(x) or
             ( not np.issubdtype(x.dtype, np.number) and not np.issubdtype(x.dtype, np.bool_) )
         ):
@@ -50,7 +54,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
 
     conf = get_config()
 
-    if isinstance(x, np.generic):
+    if isinstance(x, np.number):
         tname = None
     else:
         tname = "array" if type(x) == np.ndarray else type(x).__name__.split(".")[-1]
@@ -58,6 +62,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     shape = str(list(x.shape)) if x.ndim else None
     type_str = sparse_join([tname, shape], sep="")
 
+    show_histogram = get_config().show_histogram if show_histogram is None else show_histogram
     color = get_config().color if color is None else color
     if in_debugger(): color = False
 
@@ -69,7 +74,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     elif get_config().show_mem_above <= x.nbytes:
         numel = bytes_to_human(x.nbytes)
 
-    common = np_to_str_common(x, color=color)
+    common = np_to_str_common(x, color=color, show_histogram=show_histogram)
     dtype = short_dtype(x)
 
     vals = pretty_str(x) if 0 < x.size <= 10 else None
@@ -78,7 +83,7 @@ def lovely( x       :Union[np.ndarray, np.generic], # The data you want to explo
     if verbose:
         res += "\n" + repr(x)
 
-    if depth and x.ndim > 1:
+    if depth and isinstance(x, np.ndarray) and x.ndim > 1:
         deep_width = min(x.shape[0], conf.deeper_width) # Print at most this many lines
         with config(show_mem_above=np.inf):
             deep_lines = [ " "*conf.indent*(lvl+1) + lovely(x[i,:], depth=depth-1, lvl=lvl+1, color=color)
