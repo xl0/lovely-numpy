@@ -28,7 +28,7 @@ dev = ['scipy', 'ipython']
 version = {attr = "lovely_numpy.__version__"}
 
 [tool.setuptools.packages.find]
-include = ["lovely_numpy"]
+include = ["lovely_numpy", "lovely_numpy.*"]
 
 [tool.nbdev]
 branch = 'master'
