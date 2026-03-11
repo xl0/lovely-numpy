@@ -11,7 +11,7 @@ import warnings
 import numpy as np
 from typing import Optional, Union
 from .config import get_config
-
+from functools import cached_property
 
 # %% ../../nbs/03_utils.utils.ipynb #c5916579
 InputType = Union[np.ndarray, np.number, float]
