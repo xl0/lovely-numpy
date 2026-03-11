@@ -174,7 +174,7 @@ def fig_plot(   x     :np.ndarray,  #
                 ax      :O[axes.Axes]=None,     # Optionally, supply your own matplotlib axes.
                 summary :O[str] =None,          # Summary string (to display on top). None=str(lovely(x))
                 ddof    :int    =0,             # Apply bias correction to std
-        ) -> figure.Figure|figure.SubFigure:
+        ) -> Union[figure.Figure, figure.SubFigure]:
     """Plot statistics"""
 
     # Useful when you call `plot` from `lovely-tensors`/`-jax` and want to
@@ -255,7 +255,7 @@ class PlotProxy():
         return self
 
     @cached_property
-    def fig(self) -> figure.Figure|figure.SubFigure:
+    def fig(self) -> Union[figure.Figure,figure.SubFigure]:
         return fig_plot( self.x, **self.params)
 
     def _repr_png_(self):

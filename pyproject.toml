@@ -8,11 +8,11 @@ dynamic = ["version"]
 description = "💟 Lovely numpy"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "MIT"}
+license = "MIT"
 authors = [{name = "Alexey Zaytsev", email = "alexey.zaytsev@gmail.com"}]
 keywords = ['jupyter', 'numpy', 'visualisation']
 classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
-dependencies = ['numpy>=1.17', 'fastcore', 'matplotlib']
+dependencies = ['numpy>=1.17', 'fastcore', 'matplotlib>=3.4.0']
 
 [project.urls]
 Repository = "https://github.com/xl0/lovely-numpy"
