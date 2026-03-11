@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt, axes, figure
 import numpy as np
 from fastcore.all import store_attr
 
-from .utils import history_warning
+from .utils import history_warning, InputType
 from .utils.config import get_config
 from .repr_str import lovely
 from .repr_plt import PlotProxy
@@ -21,8 +21,9 @@ from .repr_chans import ChanProxy
 # %% ../nbs/10_lo.ipynb #20f0c603
 class Lo():
     """Lo and behold! What a lovely `numpy.ndarray`!"""
+    x: InputType
     def __init__(   self,
-                    x: Union[np.ndarray, np.generic], # Your data
+                    x: InputType,       # Your data
                     plain       =False, # Show as plain text - values only
                     verbose     =None,  # Verbose - show values too
                     depth       =0,     # Expand up to `depth`
@@ -58,16 +59,22 @@ class Lo():
     @property
     def rgb(self):
         "Show an image"
-        return RGBProxy(self.x)
+        if isinstance(self.x, np.ndarray):
+            return RGBProxy(self.x)
+        return lambda *a, **ka: None
 
     @property
     def chans(self):
         "Show color channels"
-        return ChanProxy(self.x)
+        if isinstance(self.x, np.ndarray):
+            return ChanProxy(self.x)
+        return lambda *a, **ka: None
 
     @property
     def plt(self):
-        return PlotProxy(self.x)
+        if isinstance(self.x, np.ndarray):
+            return PlotProxy(self.x)
+        return lambda *a, **ka: None
 
     # This is used for .deeper attribute and .deeper(depth=...).
     # The second one results in a __call__.
@@ -75,9 +82,9 @@ class Lo():
         return Lo(self.x, depth=depth, color=self.color)
 
 # %% ../nbs/10_lo.ipynb #31608d11
-def lo(x: Union[np.ndarray, np.generic],    # Your data
-        plain   :bool   =False, # Show as plain text - values only
-        verbose :bool   =None,  # Verbose - show values too
-        depth   :int    =0,     # Expand up to `depth`
-        color   :O[bool]=None): # Use ANSI colors
+def lo(x: InputType,    # Your data
+        plain   :bool    =False, # Show as plain text - values only
+        verbose :O[bool] =None,  # Verbose - show values too
+        depth   :int     =0,     # Expand up to `depth`
+        color   :O[bool] =None): # Use ANSI colors
     return Lo(x, plain=plain, verbose=verbose, depth=depth, color=color)

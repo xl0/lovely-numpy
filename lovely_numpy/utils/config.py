@@ -15,24 +15,39 @@ import warnings
 # %% ../../nbs/03d_utils.config.ipynb #97bcda6a
 class Config(SimpleNamespace):
     "Config"
+    precision: int
+    threshold_max: int
+    threshold_min: int
+    sci_mode: Optional[bool]
+    show_mem_above: int
+    indent: int
+    color: bool
+    verbose: bool
+    deeper_width: int
+    plt_seed: int
+    fig_close: bool
+    fig_show: bool
+    show_histogram: bool
+
     def __init__(self,
-            precision     = 3,    # Digits after `.`
-            threshold_max = 3,    # .abs() larger than 1e3 -> Sci mode
-            threshold_min = -4,   # .abs() smaller that 1e-4 -> Sci mode
-            sci_mode      = None, # Sci mode (2.3e4). None=auto
-            show_mem_above= 1024, # Show memory usage in b/Kb/Mb/Gb if it's larger than this
-            indent        = 2,    # Indent for .deeper()
-            color         = True, # ANSI colors in text
-            verbose       = False,# Show the default repr by default
-            deeper_width  =9,     # For .deeper, width per level
-            plt_seed      = 42,   # Sampling seed for `plot`
-            fig_close     = True, # Close matplotlib Figure
-            fig_show      = False,# Call `plt.show()` for `.plt`, `.chans` and `.rgb`
-    ):
+            precision     :int            = 3,    # Digits after `.`
+            threshold_max :int            = 3,    # .abs() larger than 1e3 -> Sci mode
+            threshold_min :int            = -4,   # .abs() smaller that 1e-4 -> Sci mode
+            sci_mode      :Optional[bool] = None, # Sci mode (2.3e4). None=auto
+            show_mem_above:int            = 1024, # Show memory usage in b/Kb/Mb/Gb if it's larger than this
+            indent        :int            = 2,    # Indent for .deeper()
+            color         :bool           = True, # ANSI colors in text
+            verbose       :bool           = False,# Show the default repr by default
+            deeper_width  :int            = 9,    # For .deeper, width per level
+            plt_seed      :int            = 42,   # Sampling seed for `plot`
+            fig_close     :bool           = True, # Close matplotlib Figure
+            fig_show      :bool           = False,# Call `plt.show()` for `.plt`, `.chans` and `.rgb`
+            show_histogram:bool           = True  # Show the histogram in lovely(): '▁▂▃▃▆█▆▃▁▁'
+    ) -> None:
         super().__init__(**{k:v for k,v in locals().items() if k not in ["self", "__class__"]})
 
-_defaults = Config()
-_config = copy(_defaults)
+_defaults: Config = Config()
+_config: Config = copy(_defaults)
 
 # %% ../../nbs/03d_utils.config.ipynb #bdb06b31
 # Allows passing None as an argument to reset the
@@ -56,7 +71,8 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
                 str             :Optional[Union[Default,Callable]]=D,
                 plt_seed        :Optional[Union[Default,int]]     =D,
                 fig_close       :Optional[Union[Default,bool]]    =D,
-                fig_show        :Optional[Union[Default,bool]]    =D
+                fig_show        :Optional[Union[Default,bool]]    =D,
+                show_histogram  :Optional[Union[Default,bool]]    =D,
                 ) -> None:
 
     "Set config variables"
@@ -74,7 +90,7 @@ def set_config( precision       :Optional[Union[Default,int]]     =D,
                 setattr(_config, k, v)
 
 # %% ../../nbs/03d_utils.config.ipynb #f38bfe47
-def get_config():
+def get_config() -> Config:
     "Get a copy of config variables"
     return copy(_config)
 
@@ -93,7 +109,8 @@ def config( precision       :Optional[Union[Default,int]]     =D,
             str             :Optional[Union[Default,Callable]]=D,
             plt_seed        :Optional[Union[Default,int]]     =D,
             fig_close       :Optional[Union[Default,bool]]    =D,
-            fig_show        :Optional[Union[Default,bool]]    =D
+            fig_show        :Optional[Union[Default,bool]]    =D,
+            show_histogram  :Optional[Union[Default,bool]]    =D
             ):
     "Context manager for temporarily setting config options"
     new_opts = { k:v for k, v in locals().items() if v != D}

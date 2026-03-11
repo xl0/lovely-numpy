@@ -7,7 +7,7 @@ name = "lovely-numpy"
 dynamic = ["version"]
 description = "💟 Lovely numpy"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [{name = "Alexey Zaytsev", email = "alexey.zaytsev@gmail.com"}]
 keywords = ['jupyter', 'numpy', 'visualisation']

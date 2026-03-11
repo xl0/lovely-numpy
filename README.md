@@ -86,7 +86,7 @@ from lovely_numpy import lo
 lo(numbers)
 ```
 
-    array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073
+    array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118 |▂▆█▇▂▁▁▂▃▁| 2.640] μ=-0.388 σ=1.073
 
 Better, eh?
 
@@ -132,10 +132,10 @@ lo(spicy, verbose=True)
 lo(numbers.transpose(2,1,0)).deeper
 ```
 
-    array[3, 196, 196] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073
-      array[196, 196] f32 n=38416 x∈[-2.118, 2.249] μ=-0.324 σ=1.036
-      array[196, 196] f32 n=38416 x∈[-1.966, 2.429] μ=-0.274 σ=0.973
-      array[196, 196] f32 n=38416 x∈[-1.804, 2.640] μ=-0.567 σ=1.178
+    array[3, 196, 196] f32 n=115248 (0.4Mb) x∈[-2.118 |▂▅█▇▂▁▁▂▂▁| 2.640] μ=-0.388 σ=1.073
+      array[196, 196] f32 n=38416 x∈[-2.118 |▂▃▅█▂▁▁▂▂▁| 2.249] μ=-0.324 σ=1.036
+      array[196, 196] f32 n=38416 x∈[-1.966 |▂▂▅█▁▁▁▁▂▁| 2.429] μ=-0.274 σ=0.973
+      array[196, 196] f32 n=38416 x∈[-1.804 |▃█▃▁▁▁▁▁▂▁| 2.640] μ=-0.567 σ=1.178
 
 ``` python
 # You can go deeper if you need to
@@ -200,7 +200,7 @@ numbers_01 = (numbers*std + mean).clip(0,1)
 lo(numbers_01)
 ```
 
-    array[196, 196, 3] n=115248 (0.9Mb) x∈[0., 1.000] μ=0.361 σ=0.248
+    array[196, 196, 3] n=115248 (0.9Mb) x∈[0. |▃▆▆█▂▁▁▁▃▂| 1.000] μ=0.361 σ=0.248
 
 ``` python
 lo(numbers_01).chans
@@ -221,7 +221,7 @@ eight_images = (eight_images
 lo(eight_images)
 ```
 
-    array[2, 2, 2, 196, 196, 3] n=921984 (7.0Mb) x∈[0., 1.000] μ=0.382 σ=0.319
+    array[2, 2, 2, 196, 196, 3] n=921984 (7.0Mb) x∈[0. |█▃▃▃▃▃▃▂▂▃| 1.000] μ=0.382 σ=0.319
 
 ``` python
 lo(eight_images).rgb
@@ -291,7 +291,7 @@ lovely(numbers) # Returns `str`, that's why you see ''.
 # Note:  lo(x) returns a wrapper object with a `__repr__` and other methods.
 ```
 
-    'array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118, 2.640] μ=-0.388 σ=1.073'
+    'array[196, 196, 3] f32 n=115248 (0.4Mb) x∈[-2.118 |▂▆█▇▂▁▁▂▃▁| 2.640] μ=-0.388 σ=1.073'
 
 ``` python
 rgb(numbers, denorm=in_stats) # OR: denorm='imagenet'
@@ -331,7 +331,7 @@ lo(numbers).plt.fig.savefig('pretty.svg') # Save it
 
 ``` python
 fig = plt.figure(figsize=(8,3))
-fig.set_constrained_layout(True)
+fig.set_constrained_layout(True) # type: ignore
 gs = fig.add_gridspec(2,2)
 ax1 = fig.add_subplot(gs[0, :])
 ax2 = fig.add_subplot(gs[1, 0])

@@ -12,7 +12,8 @@ from matplotlib import pyplot as plt, axes, figure, rc_context
 
 from .repr_str import lovely, pretty_str
 from .utils import get_config, config
-from .utils.utils import cached_property
+from .utils.utils import sample
+from functools import cached_property
 
 # %% ../nbs/02_repr_plt.ipynb #2ec11ab4
 def normal_pdf( x   :np.ndarray,
@@ -32,32 +33,6 @@ def normal_pdf( x   :np.ndarray,
     return (np.array(np.e) ** ( -0.5 * ((x - mean)/std) ** 2 ) /
                 (std * np.sqrt((np.pi * 2)))
             )
-
-# %% ../nbs/02_repr_plt.ipynb #7155561a
-def sample( x       :np.ndarray,
-            max_s   :int,
-            plt0    :bool):
-
-    # Samples up to max_s elements and returns
-    #   - samples from x
-    #   - original x min (None = no good numbes in x)
-    #   - original x max (None = no good numbes in x)
-
-    # Ignore NaN and Inf.
-    x = x[ np.isfinite(x) ]
-    x_min = x_max = None
-
-    if x.size:
-        x_min, x_max = x.min(), x.max()
-
-        # An option to ignore zeros
-        if not plt0: x = x[x != 0.]
-
-        if x.size > max_s and max_s > 0:
-            rng = np.random.default_rng( get_config().plt_seed )
-            x = rng.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
-
-    return (x, x_min, x_max)
 
 # %% ../nbs/02_repr_plt.ipynb #a9141894
 def find_xlims( x_min   :Union[float, None],
@@ -129,10 +104,10 @@ def plot_pdf(   x_mean  :Union[float, None],
 
 
 # %% ../nbs/02_repr_plt.ipynb #468702f9
-def plot_sigmas(x_min   :Union[float, None],
-                x_max   :Union[float, None],
-                x_mean  :Union[float, None],
-                x_std   :Union[float, None],
+def plot_sigmas(x_min   :float,
+                x_max   :float,
+                x_mean  :float,
+                x_std   :float,
                 ax      :axes.Axes):
     if x_min is not None and x_max is not None and x_std:
         xlims = ax.get_xlim()
@@ -199,12 +174,12 @@ def fig_plot(   x     :np.ndarray,  #
                 ax      :O[axes.Axes]=None,     # Optionally, supply your own matplotlib axes.
                 summary :O[str] =None,          # Summary string (to display on top). None=str(lovely(x))
                 ddof    :int    =0,             # Apply bias correction to std
-        ) -> figure.Figure:
+        ) -> figure.Figure|figure.SubFigure:
     """Plot statistics"""
 
     # Useful when you call `plot` from `lovely-tensors`/`-jax` and want to
     # display backend-specific info.
-    if summary is None: summary = str(lovely(x, color=False))
+    if summary is None: summary = str(lovely(x, color=False, show_histogram=False))
     orig_numel = x.size
 
     x, x_min, x_max = sample(x, max_s, plt0)
@@ -224,7 +199,7 @@ def fig_plot(   x     :np.ndarray,  #
 
     if not ax:
         fig, ax = plt.subplots(figsize=(12, 2))
-        fig.set_constrained_layout(True)
+        fig.set_constrained_layout(True) # type: ignore
         if close: plt.close(fig)
 
     xlims = find_xlims(x_min, x_max, x_mean, x_std, center)
@@ -236,7 +211,8 @@ def fig_plot(   x     :np.ndarray,  #
     ylim = ax.get_ylim()
     ax.set_ylim( ylim[0], ylim[1]*1.3 )
 
-    plot_sigmas(x_min, x_max, x_mean, x_std, ax)
+    if not None in (x_min, x_max, x_mean, x_std):
+        plot_sigmas(x_min, x_max, x_mean, x_std, ax) # type: ignore
     plot_minmax(x_min, x_max, ax)
     plot_str(t_str, ax)
 
@@ -253,6 +229,8 @@ def fig_plot(   x     :np.ndarray,  #
 
 class PlotProxy():
     """Flexible `PIL.Image.Image` wrapper"""
+
+    params: dict
 
     def __init__(self, x:np.ndarray):
         self.x = x
@@ -277,7 +255,7 @@ class PlotProxy():
         return self
 
     @cached_property
-    def fig(self) -> figure.Figure:
+    def fig(self) -> figure.Figure|figure.SubFigure:
         return fig_plot( self.x, **self.params)
 
     def _repr_png_(self):

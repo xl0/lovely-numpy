@@ -9,7 +9,7 @@ from typing import Any, Optional as O
 import numpy as np
 from matplotlib import pyplot as plt, axes, figure
 from .utils.tile2d import hypertile
-from .utils.utils import cached_property
+from functools import cached_property
 from .utils import get_config
 
 # %% ../nbs/01_repr_rgb.ipynb #74d98b42
@@ -82,18 +82,19 @@ def fig_rgb(x           :np.ndarray,        # Array to display. [[...], C,H,W] o
         fig = plt.figure(frameon=False, figsize=(x.shape[1] * 0.01, x.shape[0]*0.01) )
         fig.set_dpi(100)
 
-        ax = fig.add_axes([0,0,1,1])
+        ax = fig.add_axes([0,0,1,1]) # type: ignore
         ax.set_axis_off()
         if close: plt.close(fig)
 
-    ax.imshow(x, interpolation="none", aspect='equal')
+    ax.imshow(x, interpolation="none", aspect='equal') # type: ignore
     if show: plt.show()
 
-    return ax.figure
+    return ax.figure # type: ignore
 
 # %% ../nbs/01_repr_rgb.ipynb #48884cf3
 class RGBProxy():
     """Flexible `PIL.Image.Image` wrapper"""
+    params: dict
 
     def __init__(self, x:np.ndarray):
         assert x.ndim >= 3, f"Expecting at least 3 dimensions, got shape{x.shape}={x.size}"
