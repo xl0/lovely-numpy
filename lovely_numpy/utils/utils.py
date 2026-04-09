@@ -93,18 +93,18 @@ def ansi_color(s: str, col: str, use_color=True):
 
 # %% ../../nbs/03_utils.utils.ipynb #05c08059
 def bytes_to_human(num_bytes):
-    units = ['b', 'Kb', 'Mb', 'Gb']
+    units = ['B', 'KiB', 'MiB', 'GiB']
 
     value = num_bytes
     for unit in units:
-        if value < 1024 / 10:
+        if value < 1024.0 / 10:
             break
         value /= 1024.0
 
     if value % 1 == 0 or value >= 10:
-        return f"{round(value)}{unit}" # type: ignore
+        return f"{round(value)} {unit}" # type: ignore
     else:
-        return f"{value:.1f}{unit}" # type: ignore
+        return f"{value:.1f} {unit}" # type: ignore
 
 # %% ../../nbs/03_utils.utils.ipynb #0148b2d2
 def unicode_miniplot(counts: np.ndarray, blocks=" ▁▂▃▄▅▆▇█"):

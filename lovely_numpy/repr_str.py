@@ -72,7 +72,7 @@ def lovely( x       :InputType, # The data you want to explore
         if get_config().show_mem_above <= x.nbytes:
             numel = sparse_join([numel, f"({bytes_to_human(x.nbytes)})"])
     elif get_config().show_mem_above <= x.nbytes:
-        numel = bytes_to_human(x.nbytes)
+        numel = f"({bytes_to_human(x.nbytes)})"
 
     common = np_to_str_common(x, color=color, show_histogram=show_histogram)
     dtype = short_dtype(x)

@@ -34,7 +34,7 @@ class Config(SimpleNamespace):
             threshold_max :int            = 3,    # .abs() larger than 1e3 -> Sci mode
             threshold_min :int            = -4,   # .abs() smaller that 1e-4 -> Sci mode
             sci_mode      :Optional[bool] = None, # Sci mode (2.3e4). None=auto
-            show_mem_above:int            = 1024, # Show memory usage in b/Kb/Mb/Gb if it's larger than this
+            show_mem_above:int            = 1024, # Show memory usage in B/KiB/MiB/GiB if it's larger than this
             indent        :int            = 2,    # Indent for .deeper()
             color         :bool           = True, # ANSI colors in text
             verbose       :bool           = False,# Show the default repr by default
