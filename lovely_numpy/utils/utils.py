@@ -92,19 +92,22 @@ def ansi_color(s: str, col: str, use_color=True):
         return style[col]+s+end_style if use_color else s
 
 # %% ../../nbs/03_utils.utils.ipynb #05c08059
-def bytes_to_human(num_bytes):
+def bytes_to_human(num_bytes: int):
     units = ['B', 'KiB', 'MiB', 'GiB']
 
     value = num_bytes
     for unit in units:
-        if value < 1024.0 / 10:
+        if value < 1024:
             break
-        value /= 1024.0
+        value /= 1024
 
-    if value % 1 == 0 or value >= 10:
-        return f"{round(value)} {unit}" # type: ignore
+    if value % 1 == 0 or value >= 100: # Integer or 101.123 -> Display only the int part: `1` or `101`
+        v = f"{round(value)}"
+    elif value >= 10:
+        v = f"{value:.1f}" # 20.123 - display with 1 decimal point: `20.1`
     else:
-        return f"{value:.1f} {unit}" # type: ignore
+        v = f"{value:.2f}" # 1.234 - display with 2 decimal points: `1.23`
+    return f"{v} {unit}" # type: ignore
 
 # %% ../../nbs/03_utils.utils.ipynb #0148b2d2
 def unicode_miniplot(counts: np.ndarray, blocks=" ▁▂▃▄▅▆▇█"):
