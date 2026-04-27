@@ -21,26 +21,76 @@ def sample( x       :np.ndarray,
             max_s   :int,
             plt0    :bool):
 
-    # Samples up to max_s elements and returns
-    #   - samples from x
-    #   - original x min (None = no good numbes in x)
-    #   - original x max (None = no good numbes in x)
+    """Return a bounded sample plus finite min/max for `x`.
 
-    # Ignore NaN and Inf.
-    x = x[ np.isfinite(x) ]
+    NaN/Inf values are ignored. If `plt0` is false, zeros are excluded
+    from the returned sample, but still included in the finite min/max.
+
+    The implementation scans in chunks so large arrays do not need full-size
+    finite/nonzero copies. Sampling remains with replacement, matching
+    `np.random.Generator.choice`.
+    """
+    assert max_s > 0, f"max_s needs to be >0, got {max_s}"
+
+    x = x.reshape(-1)
+    chunk_s = 1_000_000
     x_min = x_max = None
+    n = 0
 
-    if x.size:
-        x_min, x_max = x.min(), x.max()
+    # First pass: compute finite min/max and count sample-eligible values.
+    for i in range(0, x.size, chunk_s):
+        chunk = x[i:i + chunk_s]
+        finite = np.isfinite(chunk)
+        if not finite.any(): continue
 
-        # An option to ignore zeros
-        if not plt0: x = x[x != 0.]
+        good = chunk[finite]
+        c_min, c_max = good.min(), good.max()
+        x_min = c_min if x_min is None else min(x_min, c_min)
+        x_max = c_max if x_max is None else max(x_max, c_max)
+        n += good.size if plt0 else np.count_nonzero(good != 0.)
 
-        if x.size > max_s and max_s > 0:
-            rng = np.random.default_rng( get_config().plt_seed )
-            x = rng.choice(x.reshape(-1), max_s) # Sample with replacement for efficiency
+    if n == 0:
+        return (np.asarray([], dtype=x.dtype), x_min, x_max)
 
-    return (x, x_min, x_max)
+    if n <= max_s:
+        # No sampling needed; rebuild the filtered array chunk by chunk.
+        chunks = []
+        for i in range(0, x.size, chunk_s):
+            chunk = x[i:i + chunk_s]
+            finite = np.isfinite(chunk)
+            if not finite.any(): continue
+            good = chunk[finite]
+            if not plt0: good = good[good != 0.]
+            if good.size: chunks.append(good)
+        return (np.concatenate(chunks), x_min, x_max)
+
+    rng = np.random.default_rng( get_config().plt_seed )
+    # Pick positions in the conceptual filtered array. Sorting lets the
+    # second pass collect samples while streaming forward through `x`.
+    targets = rng.choice(n, max_s)
+    order = np.argsort(targets)
+    targets = targets[order]
+    out = np.empty(max_s, dtype=x.dtype)
+    seen = target_i = 0
+
+    # Second pass: walk the filtered values in order and copy out requested
+    # positions. `seen` is the filtered-array offset at the start of the
+    # current chunk; `order` restores the original random sample order.
+    for i in range(0, x.size, chunk_s):
+        chunk = x[i:i + chunk_s]
+        finite = np.isfinite(chunk)
+        if not finite.any(): continue
+        good = chunk[finite]
+        if not plt0: good = good[good != 0.]
+        if not good.size: continue
+
+        end = seen + good.size
+        while target_i < max_s and targets[target_i] < end:
+            out[order[target_i]] = good[targets[target_i] - seen]
+            target_i += 1
+        seen = end
+
+    return (out, x_min, x_max)
 
 # %% ../../nbs/03_utils.utils.ipynb #356f1db2
 # Do we want this float in decimal or scientific mode?
