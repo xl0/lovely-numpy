@@ -26,71 +26,88 @@ def sample( x       :np.ndarray,
     NaN/Inf values are ignored. If `plt0` is false, zeros are excluded
     from the returned sample, but still included in the finite min/max.
 
-    The implementation scans in chunks so large arrays do not need full-size
-    finite/nonzero copies. Sampling remains with replacement, matching
-    `np.random.Generator.choice`.
+    Sampling is approximate: it probes random positions and rejects values
+    that should not be plotted. Min/max stay exact for finite values: the
+    common NaN-only path uses fast NumPy reductions, and arrays containing
+    Inf fall back to a finite-only chunked scan.
     """
     assert max_s > 0, f"max_s needs to be >0, got {max_s}"
 
     x = x.reshape(-1)
-    chunk_s = 1_000_000
-    x_min = x_max = None
-    n = 0
+    if x.size == 0:
+        return (np.asarray([], dtype=x.dtype), None, None)
 
-    # First pass: compute finite min/max and count sample-eligible values.
-    for i in range(0, x.size, chunk_s):
-        chunk = x[i:i + chunk_s]
-        finite = np.isfinite(chunk)
-        if not finite.any(): continue
+    def valid(v):
+        v = v[np.isfinite(v)]
+        return v if plt0 else v[v != 0.]
 
-        good = chunk[finite]
-        c_min, c_max = good.min(), good.max()
-        x_min = c_min if x_min is None else min(x_min, c_min)
-        x_max = c_max if x_max is None else max(x_max, c_max)
-        n += good.size if plt0 else np.count_nonzero(good != 0.)
-
-    if n == 0:
-        return (np.asarray([], dtype=x.dtype), x_min, x_max)
-
-    if n <= max_s:
-        # No sampling needed; rebuild the filtered array chunk by chunk.
-        chunks = []
+    def finite_minmax_chunked():
+        x_min = x_max = None
+        chunk_s = 1_000_000
         for i in range(0, x.size, chunk_s):
             chunk = x[i:i + chunk_s]
             finite = np.isfinite(chunk)
-            if not finite.any(): continue
-            good = chunk[finite]
-            if not plt0: good = good[good != 0.]
-            if good.size: chunks.append(good)
-        return (np.concatenate(chunks), x_min, x_max)
+            if finite.all():    good = chunk
+            elif finite.any():  good = chunk[finite]
+            else:               continue
+
+            c_min, c_max = good.min(), good.max()
+            x_min = c_min if x_min is None else min(x_min, c_min)
+            x_max = c_max if x_max is None else max(x_max, c_max)
+        return x_min, x_max
+
+    # Fast path: nanmin/nanmax are optimized reductions and are exact when
+    # the only non-finite values are NaNs. They intentionally do not ignore
+    # +/-Inf; those bounds are detected below and handled by a slower fallback.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning) # Warning if _all_ items are nan.
+        x_min, x_max = np.nanmin(x), np.nanmax(x)
+
+    if np.isnan(x_min) or np.isnan(x_max): # Again, if all are nan, min/max will be nan as well.
+        return (np.asarray([], dtype=x.dtype), None, None)
+
+    if not (np.isfinite(x_min) and np.isfinite(x_max)):
+        # Rare path: infinities would break histogram limits, so compute
+        # exact min/max over finite values only.
+        x_min, x_max = finite_minmax_chunked()
+
+        if x_min is None:
+            return (np.asarray([], dtype=x.dtype), x_min, x_max)
+
 
     rng = np.random.default_rng( get_config().plt_seed )
-    # Pick positions in the conceptual filtered array. Sorting lets the
-    # second pass collect samples while streaming forward through `x`.
-    targets = rng.choice(n, max_s)
-    order = np.argsort(targets)
-    targets = targets[order]
+
+    # Arbitrary fast-path cutoff at 128MiB: materializing the filtered
+    # copy is OK below this size.
+    if x.nbytes <= 1024*1024*128:
+        good = valid(x)
+        if good.size <= max_s:
+            return (good, x_min, x_max) 
+
+        return (good[rng.integers(0, good.size, max_s)], x_min, x_max)
+    
+    # Slow path - instead of materializing a 'good' (sans nan/inf) copy, we will repeatedly draw chunks from
+    # the input, and extract the 'good' samples from them. This limits the amount of memory used. 
+
     out = np.empty(max_s, dtype=x.dtype)
-    seen = target_i = 0
+    filled = draws = 0
+    batch_s = max(1024, max_s * 2)
+    max_draws = max(1_000_000, max_s * 64)
 
-    # Second pass: walk the filtered values in order and copy out requested
-    # positions. `seen` is the filtered-array offset at the start of the
-    # current chunk; `order` restores the original random sample order.
-    for i in range(0, x.size, chunk_s):
-        chunk = x[i:i + chunk_s]
-        finite = np.isfinite(chunk)
-        if not finite.any(): continue
-        good = chunk[finite]
-        if not plt0: good = good[good != 0.]
-        if not good.size: continue
+    # Draw random indices directly from the original array. Rejection keeps
+    # NaN/Inf out of the plotted sample and optionally removes zeros. If an
+    # array is sparse in eligible values, keep drawing up to a bounded cap.
+    while filled < max_s and draws < max_draws:
+        batch = min(batch_s, max_draws - draws)
+        good = valid(x[rng.integers(0, x.size, batch)])
 
-        end = seen + good.size
-        while target_i < max_s and targets[target_i] < end:
-            out[order[target_i]] = good[targets[target_i] - seen]
-            target_i += 1
-        seen = end
+        take = min(max_s - filled, good.size)
+        if take:
+            out[filled:filled + take] = good[:take]
+            filled += take
+        draws += batch
 
-    return (out, x_min, x_max)
+    return (out[:filled], x_min, x_max)
 
 # %% ../../nbs/03_utils.utils.ipynb #356f1db2
 # Do we want this float in decimal or scientific mode?
