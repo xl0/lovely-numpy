@@ -55,7 +55,6 @@ def chunked_stats(a: np.ndarray, ddof: int) -> tuple[int, int | float, int | flo
 
             count = int(finite.sum())
             if count == 0:
-                all_zero = False
                 continue
             good = chunk[finite]
 
@@ -76,7 +75,7 @@ def chunked_stats(a: np.ndarray, ddof: int) -> tuple[int, int | float, int | flo
             x_max = float(np.inf if has_posinf else -np.inf)
         else:
             x_min = x_max = float(np.nan)
-        return (0, x_min, x_max, float(np.nan), float(np.nan), all_zero, has_nan,
+        return (0, x_min, x_max, float(np.nan), float(np.nan), False, has_nan,
                 has_posinf, has_neginf)
 
     assert x_min is not None and x_max is not None
