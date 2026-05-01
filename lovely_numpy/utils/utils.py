@@ -64,7 +64,7 @@ def chunked_stats(a: np.ndarray, ddof: int) -> tuple[int, int | float, int | flo
         x_max = chunk_max if x_max is None else max(x_max, chunk_max)
         total_count += good.size
         total += float(good.sum(dtype=np.float64))
-        sumsq += float(np.sum(good * good, dtype=np.float64))
+        sumsq += float(np.square(good, dtype=np.float64).sum())
 
         if all_zero and np.any(good != 0):
             all_zero = False
