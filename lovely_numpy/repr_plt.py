@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt, axes, figure, rc_context
 
 from .repr_str import lovely, pretty_str
 from .utils import get_config, config
-from .utils.utils import sample
+from .utils.utils import chunked_stats, sample
 from functools import cached_property
 
 # %% ../nbs/02_repr_plt.ipynb #2ec11ab4
@@ -44,6 +44,7 @@ def find_xlims( x_min   :Union[float, None],
     assert center in ["zero", "mean", "range"]
 
     if x_min is None or x_max is None: return (-1., 1,)
+    if not (np.isfinite(x_min) and np.isfinite(x_max)): return (-1., 1,)
     if x_min == x_max and center == "range": center = "zero"
     if x_mean is None or x_std is None and center == "mean": center = "zero"
 
@@ -182,7 +183,8 @@ def fig_plot(   x     :np.ndarray,  #
     if summary is None: summary = str(lovely(x, color=False, show_histogram=False))
     orig_numel = x.size
 
-    x, x_min, x_max = sample(x, max_s, plt0)
+    _, x_min, x_max, *_ = chunked_stats(x, ddof)
+    x = sample(x, max_s, plt0)
     x_mean, x_std = (x.mean(), x.std(ddof=ddof)) if x.size else (None,None)
 
 
@@ -190,8 +192,12 @@ def fig_plot(   x     :np.ndarray,  #
     if x.size != orig_numel:
         t_str += str(x.size)
         if not plt0: t_str += " non-zero"
-        t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
+        if x.size:
+            t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
+        else:
+            t_str += " samples of "
     t_str += summary
+    no_sample_warning = None if x.size else ("No finite samples" if plt0 else "No finite non-zero samples")
 
     cfg = get_config()
     close = cfg.fig_close and not cfg.fig_show # Don't close if requested to show
@@ -204,8 +210,9 @@ def fig_plot(   x     :np.ndarray,  #
 
     xlims = find_xlims(x_min, x_max, x_mean, x_std, center)
     ax.set_xlim(*xlims)
-    plot_histogram(x,  ax)
-    plot_pdf(x_mean, x_std, ax)
+    if x.size:
+        plot_histogram(x,  ax)
+        plot_pdf(x_mean, x_std, ax)
 
     # Add extra space to make sure the labels clear the histogram
     ylim = ax.get_ylim()
@@ -214,6 +221,11 @@ def fig_plot(   x     :np.ndarray,  #
     if not None in (x_min, x_max, x_mean, x_std):
         plot_sigmas(x_min, x_max, x_mean, x_std, ax) # type: ignore
     plot_minmax(x_min, x_max, ax)
+    if no_sample_warning is not None:
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+        ax.text((xlim[0] + xlim[1]) / 2, (ylim[0] + ylim[1]) / 2, no_sample_warning,
+                ha="center", va="center", color="grey")
     plot_str(t_str, ax)
 
     ax.set_yticks([])
