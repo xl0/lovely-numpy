@@ -128,36 +128,35 @@ def plot_sigmas(x_min   :float,
 
 
 # %% ../nbs/02_repr_plt.ipynb #633f5959
-def plot_minmax(x_min   :Union[float, None],
-                x_max   :Union[float, None],
+def plot_minmax(x_min   :float| int,
+                x_max   :float| int,
                 ax      :axes.Axes):
-    if x_min is not None and x_max is not None:
-        bbox = dict(boxstyle="round", fc="white", edgecolor="none", pad=0.)
-        y_max = ax.get_ylim()[1]
+    bbox = dict(boxstyle="round", fc="white", edgecolor="none", pad=0.)
+    y_max = ax.get_ylim()[1]
 
-        # 2 red lines for min and max values
-        ax.annotate(
-            f"min={pretty_str(x_min)}",
-            (x_min, y_max/2),
-            xytext=(-1, 0), textcoords='offset points',
-            bbox=bbox,
-            rotation=90,
-            ha="right",
-            va="center"
-            )
+    # 2 red lines for min and max values
+    ax.annotate(
+        f"min={pretty_str(x_min)}",
+        (x_min, y_max/2),
+        xytext=(-1, 0), textcoords='offset points',
+        bbox=bbox,
+        rotation=90,
+        ha="right",
+        va="center"
+        )
 
-        ax.annotate(
-            f"max={pretty_str(x_max)}",
-            (x_max, y_max/2),
-            xytext=(2, 0), textcoords='offset points',
-            bbox=bbox,
-            rotation=90,
-            ha="left",
-            va="center"
-            )
+    ax.annotate(
+        f"max={pretty_str(x_max)}",
+        (x_max, y_max/2),
+        xytext=(2, 0), textcoords='offset points',
+        bbox=bbox,
+        rotation=90,
+        ha="left",
+        va="center"
+        )
 
-        ax.axvline(x_min, 0, 1, c="red", zorder=2)
-        ax.axvline(x_max, 0, 1, c="red", zorder=2)
+    ax.axvline(x_min, 0, 1, c="red", zorder=2)
+    ax.axvline(x_max, 0, 1, c="red", zorder=2)
 
 
 # %% ../nbs/02_repr_plt.ipynb #0a893fe0
@@ -185,19 +184,21 @@ def fig_plot(   x     :np.ndarray,  #
 
     _, x_min, x_max, *_ = chunked_stats(x, ddof)
     x = sample(x, max_s, plt0)
-    x_mean, x_std = (x.mean(), x.std(ddof=ddof)) if x.size else (None,None)
+    x_mean, x_std = (x.mean(), x.std(ddof=ddof)) if x.size else (None, None)
 
 
     t_str = ""
     if x.size != orig_numel:
         t_str += str(x.size)
         if not plt0: t_str += " non-zero"
-        if x.size:
-            t_str += f" samples (μ={pretty_str(x_mean)}, σ={pretty_str(x_std)}) of "
-        else:
-            t_str += " samples of "
+        t_str += " samples of "
     t_str += summary
-    no_sample_warning = None if x.size else ("No finite samples" if plt0 else "No finite non-zero samples")
+    if x.size:
+        no_sample_warning = None
+    elif orig_numel == 0:
+        no_sample_warning = "Empty input"
+    else:
+        no_sample_warning = "No finite samples" if plt0 else "No finite non-zero samples"
 
     cfg = get_config()
     close = cfg.fig_close and not cfg.fig_show # Don't close if requested to show
@@ -212,15 +213,17 @@ def fig_plot(   x     :np.ndarray,  #
     ax.set_xlim(*xlims)
     if x.size:
         plot_histogram(x,  ax)
-        plot_pdf(x_mean, x_std, ax)
+        if x.size >= 50:
+            plot_pdf(x_mean, x_std, ax)
 
     # Add extra space to make sure the labels clear the histogram
     ylim = ax.get_ylim()
     ax.set_ylim( ylim[0], ylim[1]*1.3 )
 
-    if not None in (x_min, x_max, x_mean, x_std):
-        plot_sigmas(x_min, x_max, x_mean, x_std, ax) # type: ignore
-    plot_minmax(x_min, x_max, ax)
+    if x.size >= 50 and np.isfinite(x_min) and np.isfinite(x_max) and x_mean is not None and x_std is not None:
+        plot_sigmas(x_min, x_max, x_mean, x_std, ax)
+    if x.size and np.isfinite(x_min) and np.isfinite(x_max):
+        plot_minmax(x_min, x_max, ax)
     if no_sample_warning is not None:
         xlim = ax.get_xlim()
         ylim = ax.get_ylim()
