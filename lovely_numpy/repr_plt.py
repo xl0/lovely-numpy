@@ -128,36 +128,35 @@ def plot_sigmas(x_min   :float,
 
 
 # %% ../nbs/02_repr_plt.ipynb #633f5959
-def plot_minmax(x_min   :Union[float, None],
-                x_max   :Union[float, None],
+def plot_minmax(x_min   :float,
+                x_max   :float,
                 ax      :axes.Axes):
-    if x_min is not None and x_max is not None:
-        bbox = dict(boxstyle="round", fc="white", edgecolor="none", pad=0.)
-        y_max = ax.get_ylim()[1]
+    bbox = dict(boxstyle="round", fc="white", edgecolor="none", pad=0.)
+    y_max = ax.get_ylim()[1]
 
-        # 2 red lines for min and max values
-        ax.annotate(
-            f"min={pretty_str(x_min)}",
-            (x_min, y_max/2),
-            xytext=(-1, 0), textcoords='offset points',
-            bbox=bbox,
-            rotation=90,
-            ha="right",
-            va="center"
-            )
+    # 2 red lines for min and max values
+    ax.annotate(
+        f"min={pretty_str(x_min)}",
+        (x_min, y_max/2),
+        xytext=(-1, 0), textcoords='offset points',
+        bbox=bbox,
+        rotation=90,
+        ha="right",
+        va="center"
+        )
 
-        ax.annotate(
-            f"max={pretty_str(x_max)}",
-            (x_max, y_max/2),
-            xytext=(2, 0), textcoords='offset points',
-            bbox=bbox,
-            rotation=90,
-            ha="left",
-            va="center"
-            )
+    ax.annotate(
+        f"max={pretty_str(x_max)}",
+        (x_max, y_max/2),
+        xytext=(2, 0), textcoords='offset points',
+        bbox=bbox,
+        rotation=90,
+        ha="left",
+        va="center"
+        )
 
-        ax.axvline(x_min, 0, 1, c="red", zorder=2)
-        ax.axvline(x_max, 0, 1, c="red", zorder=2)
+    ax.axvline(x_min, 0, 1, c="red", zorder=2)
+    ax.axvline(x_max, 0, 1, c="red", zorder=2)
 
 
 # %% ../nbs/02_repr_plt.ipynb #0a893fe0
@@ -185,7 +184,7 @@ def fig_plot(   x     :np.ndarray,  #
 
     _, x_min, x_max, *_ = chunked_stats(x, ddof)
     x = sample(x, max_s, plt0)
-    x_mean, x_std = (x.mean(), x.std(ddof=ddof)) if x.size else (None,None)
+    x_mean, x_std = (float(x.mean()), float(x.std(ddof=ddof))) if x.size else (np.nan, np.nan)
 
 
     t_str = ""
@@ -218,9 +217,9 @@ def fig_plot(   x     :np.ndarray,  #
     ylim = ax.get_ylim()
     ax.set_ylim( ylim[0], ylim[1]*1.3 )
 
-    if not None in (x_min, x_max, x_mean, x_std):
+    if not np.nan in (x_min, x_max, x_mean, x_std):
         plot_sigmas(x_min, x_max, x_mean, x_std, ax) # type: ignore
-    plot_minmax(x_min, x_max, ax)
+        plot_minmax(x_min, x_max, ax)
     if no_sample_warning is not None:
         xlim = ax.get_xlim()
         ylim = ax.get_ylim()
