@@ -16,64 +16,103 @@ from functools import cached_property
 # %% ../../nbs/03_utils.utils.ipynb #c5916579
 InputType = Union[np.ndarray, np.number, float]
 
+# %% ../../nbs/03_utils.utils.ipynb #e30361d2
+def chunked_stats(a: np.ndarray, ddof: int) -> tuple[int, int | float, int | float, float, float, bool, bool, bool, bool]:
+    """Compute exact finite-only stats with bounded temporary memory.
+
+    We chunk because the naive `x[np.isfinite(x)]` approach materializes one
+    full copy of all finite values. On large arrays that extra allocation is
+    expensive in both memory and time. Chunking keeps the working set small
+    while still returning exact min/max/mean/std and the `np_to_str_common`
+    attention flags."""
+
+    x = a.reshape(-1)
+    chunk_s = 128 * 1024
+    total_count = 0
+    x_min: Optional[int | float] = None
+    x_max: Optional[int | float] = None
+    total = 0.0
+    sumsq = 0.0
+    all_zero = True
+    has_nan = False
+    has_posinf = False
+    has_neginf = False
+
+    # Process the array in small slices so we never need a full finite-only
+    # copy of `x` in memory. Clean chunks stay on the fast path and only
+    # chunks with non-finite values pay the extra classification cost.
+    for i in range(0, x.size, chunk_s):
+        chunk = x[i:i + chunk_s]
+        finite = np.isfinite(chunk)
+
+        if finite.all():
+            good = chunk
+        else:
+            bad = chunk[~finite]
+            has_nan = has_nan or bool(np.isnan(bad).any())
+            has_posinf = has_posinf or bool(np.isposinf(bad).any())
+            has_neginf = has_neginf or bool(np.isneginf(bad).any())
+
+            count = int(finite.sum())
+            if count == 0:
+                all_zero = False
+                continue
+            good = chunk[finite]
+
+        chunk_min = good.min().item()
+        chunk_max = good.max().item()
+        x_min = chunk_min if x_min is None else min(x_min, chunk_min)
+        x_max = chunk_max if x_max is None else max(x_max, chunk_max)
+        total_count += good.size
+        total += float(good.sum(dtype=np.float64))
+        sumsq += float(np.sum(good * good, dtype=np.float64))
+
+        if all_zero and np.any(good != 0):
+            all_zero = False
+
+    if total_count == 0:
+        if has_posinf or has_neginf:
+            x_min = float(-np.inf if has_neginf else np.inf)
+            x_max = float(np.inf if has_posinf else -np.inf)
+        else:
+            x_min = x_max = float(np.nan)
+        return (0, x_min, x_max, float(np.nan), float(np.nan), all_zero, has_nan,
+                has_posinf, has_neginf)
+
+    assert x_min is not None and x_max is not None
+    mean = total / total_count
+    denom = total_count - ddof
+    if denom > 0:
+        # Variance from running sum/sum-of-squares avoids storing all finite
+        # values, and `max(..., 0.0)` guards against tiny negative values
+        # from floating-point cancellation.
+        ss = sumsq - total * total / total_count
+        std = float(np.sqrt(max(ss, 0.0) / denom))
+    else:
+        std = float(np.nan)
+
+    return (total_count, x_min, x_max, mean, std, all_zero, has_nan,
+            has_posinf, has_neginf)
+
 # %% ../../nbs/03_utils.utils.ipynb #abc540e5
 def sample( x       :np.ndarray,
             max_s   :int,
             plt0    :bool):
 
-    """Return a bounded sample plus finite min/max for `x`.
+    """Return a bounded sample of finite values from `x`.
 
     NaN/Inf values are ignored. If `plt0` is false, zeros are excluded
-    from the returned sample, but still included in the finite min/max.
-
-    Sampling is approximate: it probes random positions and rejects values
-    that should not be plotted. Min/max stay exact for finite values: the
-    common NaN-only path uses fast NumPy reductions, and arrays containing
-    Inf fall back to a finite-only chunked scan.
+    from the returned sample as well.
     """
     assert max_s > 0, f"max_s needs to be >0, got {max_s}"
 
     x = x.reshape(-1)
     if x.size == 0:
-        return (np.asarray([], dtype=x.dtype), None, None)
+        return np.asarray([], dtype=x.dtype)
 
     def valid(v):
         v = v[np.isfinite(v)]
         return v if plt0 else v[v != 0.]
-
-    def finite_minmax_chunked():
-        x_min = x_max = None
-        chunk_s = 1_000_000
-        for i in range(0, x.size, chunk_s):
-            chunk = x[i:i + chunk_s]
-            finite = np.isfinite(chunk)
-            if finite.all():    good = chunk
-            elif finite.any():  good = chunk[finite]
-            else:               continue
-
-            c_min, c_max = good.min(), good.max()
-            x_min = c_min if x_min is None else min(x_min, c_min)
-            x_max = c_max if x_max is None else max(x_max, c_max)
-        return x_min, x_max
-
-    # Fast path: nanmin/nanmax are optimized reductions and are exact when
-    # the only non-finite values are NaNs. They intentionally do not ignore
-    # +/-Inf; those bounds are detected below and handled by a slower fallback.
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning) # Warning if _all_ items are nan.
-        x_min, x_max = np.nanmin(x), np.nanmax(x)
-
-    if np.isnan(x_min) or np.isnan(x_max): # Again, if all are nan, min/max will be nan as well.
-        return (np.asarray([], dtype=x.dtype), None, None)
-
-    if not (np.isfinite(x_min) and np.isfinite(x_max)):
-        # Rare path: infinities would break histogram limits, so compute
-        # exact min/max over finite values only.
-        x_min, x_max = finite_minmax_chunked()
-
-        if x_min is None:
-            return (np.asarray([], dtype=x.dtype), x_min, x_max)
-
 
     rng = np.random.default_rng( get_config().plt_seed )
 
@@ -82,9 +121,9 @@ def sample( x       :np.ndarray,
     if x.nbytes <= 1024*1024*128:
         good = valid(x)
         if good.size <= max_s:
-            return (good, x_min, x_max) 
+            return good
 
-        return (good[rng.integers(0, good.size, max_s)], x_min, x_max)
+        return good[rng.integers(0, good.size, max_s)]
     
     # Slow path - instead of materializing a 'good' (sans nan/inf) copy, we will repeatedly draw chunks from
     # the input, and extract the 'good' samples from them. This limits the amount of memory used. 
@@ -107,7 +146,7 @@ def sample( x       :np.ndarray,
             filled += take
         draws += batch
 
-    return (out[:filled], x_min, x_max)
+    return out[:filled]
 
 # %% ../../nbs/03_utils.utils.ipynb #356f1db2
 # Do we want this float in decimal or scientific mode?
@@ -162,7 +201,7 @@ def ansi_color(s: str, col: str, use_color=True):
 def bytes_to_human(num_bytes: int):
     units = ['B', 'KiB', 'MiB', 'GiB']
 
-    value = num_bytes
+    value: float = num_bytes
     for unit in units:
         if value < 1024:
             break
@@ -202,29 +241,30 @@ def np_to_str_common(   x: Union[np.ndarray, np.number],       # Input
     if x.size == 0:
         return ansi_color("empty", "grey", color)
 
-    zeros = ansi_color("all_zeros", "grey", color) if np.equal(x, 0.).all() and x.size > 1 else None
-    pinf = ansi_color("+Inf!", "red", color) if np.isposinf(x).any() else None # type: ignore
-    ninf = ansi_color("-Inf!", "red", color) if np.isneginf(x).any() else None # type: ignore
-    nan = ansi_color("NaN!", "red", color) if np.isnan(x).any() else None
+    summary = None
+    if isinstance(x, np.ndarray):
+        count, x_min, x_max, x_mean, x_std, all_zero, has_nan, has_posinf, has_neginf = chunked_stats(x, ddof)
+        zeros = ansi_color("all_zeros", "grey", color) if all_zero and x.size > 1 else None
+        pinf = ansi_color("+Inf!", "red", color) if has_posinf else None
+        ninf = ansi_color("-Inf!", "red", color) if has_neginf else None
+        nan = ansi_color("NaN!", "red", color) if has_nan else None
 
-    attention = sparse_join([zeros,pinf,ninf,nan])
-
-    summary=None
-    if not zeros and isinstance(x, np.ndarray):
-        # Calculate stats on good values only.
-        gx = x[ np.isfinite(x) ]
-
-        if gx.size >= 2:
-            _min, _max = gx.min(), gx.max()
-            if show_histogram and _min != _max and gx.size > 50:
-                counts, _ = np.histogram(sample(gx, 10000, True)[0], bins=10, range=(_min, _max))
-                minmax = f"x∈[{pretty_str(_min)} |{unicode_miniplot(counts)}| {pretty_str(_max)}]" if gx.size > 2 else None
+        if not zeros and count >= 2:
+            if show_histogram and x_min != x_max and count > 50:
+                counts, _ = np.histogram(sample(x, 10000, True), bins=10, range=(x_min, x_max))
+                minmax = f"x∈[{pretty_str(x_min)} |{unicode_miniplot(counts)}| {pretty_str(x_max)}]" if count > 2 else None
             else:
-                minmax = f"x∈[{pretty_str(_min)}, {pretty_str(_max)}]" if gx.size > 2 else None
-        else: minmax = None
+                minmax = f"x∈[{pretty_str(x_min)}, {pretty_str(x_max)}]" if count > 2 else None
 
-        meanstd = f"μ={pretty_str(gx.mean())} σ={pretty_str(gx.std(ddof=ddof))}" if gx.size >= 2 else None
-        summary = sparse_join([minmax, meanstd])
+            meanstd = f"μ={pretty_str(x_mean)} σ={pretty_str(x_std)}"
+            summary = sparse_join([minmax, meanstd])
+    else:
+        zeros = ansi_color("all_zeros", "grey", color) if np.equal(x, 0.).all() and x.size > 1 else None
+        pinf = ansi_color("+Inf!", "red", color) if np.isposinf(x).any() else None # type: ignore
+        ninf = ansi_color("-Inf!", "red", color) if np.isneginf(x).any() else None # type: ignore
+        nan = ansi_color("NaN!", "red", color) if np.isnan(x).any() else None
+
+    attention = sparse_join([zeros, pinf, ninf, nan])
 
     return sparse_join([ summary, attention])
 
