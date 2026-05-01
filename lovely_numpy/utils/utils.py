@@ -129,8 +129,8 @@ def sample( x       :np.ndarray,
 
     out = np.empty(max_s, dtype=x.dtype)
     filled = draws = 0
-    batch_s = max(1024, max_s * 2)
-    max_draws = max(1_000_000, max_s * 64)
+    max_draws = max(1024*1024, max_s * 64)
+    batch_s = max(1024, max_draws  // 64)
 
     # Draw random indices directly from the original array. Rejection keeps
     # NaN/Inf out of the plotted sample and optionally removes zeros. If an
