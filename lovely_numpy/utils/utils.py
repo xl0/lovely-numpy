@@ -250,7 +250,15 @@ def np_to_str_common(   x: Union[np.ndarray, np.number],       # Input
 
         if not zeros and count >= 2:
             if show_histogram and x_min != x_max and count > 50:
-                counts, _ = np.histogram(sample(x, 10000, True), bins=10, range=(x_min, x_max))
+                if np.issubdtype(x.dtype, np.bool_):
+                    # `chunked_stats` already counted True values as `total`, so
+                    # derive exact False/True bins from the mean without scanning
+                    # huge boolean arrays again.
+                    # Note: .histogram() does not work on bool. We create the counts manualy.
+                    n_true = int(round(x_mean * count))
+                    counts = np.array([count - n_true, n_true])
+                else:
+                    counts, _ = np.histogram(sample(x, 10000, True), bins=10, range=(x_min, x_max))
                 minmax = f"x∈[{pretty_str(x_min)} |{unicode_miniplot(counts)}| {pretty_str(x_max)}]" if count > 2 else None
             else:
                 minmax = f"x∈[{pretty_str(x_min)}, {pretty_str(x_max)}]" if count > 2 else None
